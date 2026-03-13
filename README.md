@@ -1,46 +1,46 @@
 🌌 Inner Worlds
-Five mindfulness practices. One breath. No install.
-A mobile-first mindfulness game collection built entirely in pure HTML — no frameworks, no dependencies, no accounts. Open it in any browser and begin.
+Nine mindfulness practices. One breath. No install.
+A mobile-first mindfulness game collection built entirely in pure HTML — no frameworks, no dependencies, no accounts. Open in any browser and begin.
 
-✨ The Five Practices
+✨ The Nine Practices
 🌊 Still Waters — Breathing
-Follow a glowing orb through guided inhale / hold / exhale cycles. Progress through three levels of consciousness, each tuned to a Solfeggio healing frequency. Touch the screen to create ripples. The ambient drone shifts as you deepen.
+Follow a glowing orb through guided inhale / hold / exhale cycles across three levels of consciousness, each tuned to a Solfeggio healing frequency. Touch the screen to create ripples.
 
-Awakening — 174 Hz · 4s inhale · 1.6s hold · 4.4s exhale
-Flowing — 285 Hz · 5s inhale · 2s hold · 5s exhale
-Transcending — 396 Hz · 6s inhale · 2.4s hold · 6s exhale
+Awakening — 174 Hz · 4s in · 1.6s hold · 4.4s out
+Flowing — 285 Hz · 5s in · 2s hold · 5s out
+Transcending — 396 Hz · 6s in · 2.4s hold · 6s out
 
 🔥 Ember Mind — Thought Release
-Write what weighs on you. Watch it burn letter by letter. From the ash, a truth rises. Five rounds; each thought released earns a mantra. Let the fire do what the mind cannot.
+Write what weighs on you. Watch it burn letter by letter. From the ash, a mantra rises. Five rounds of release, each deeper than the last.
 🌿 Root — 5-4-3-2-1 Grounding
-The classic sensory grounding technique, made interactive. Tap through five senses — see, touch, hear, smell, taste — acknowledging the world around you. An affirmation blooms after each sense is complete.
+The classic sensory anchoring practice, made interactive. Tap through five senses — see, touch, hear, smell, taste. An affirmation blooms after each sense is complete.
 🍃 Drift — Leaf River
-Thoughts fall like autumn leaves. Tap each one before it hits the ground to catch it and release it to the river. Sixty seconds. Let them go.
+Thoughts fall like autumn leaves. Tap each one to catch it and release it to the river before it hits the ground. 60 seconds. Let them go.
 ✨ Constellation — Intention Setting
-Name up to seven intentions and plant each one as a star on the canvas. Tap pairs of stars to draw lines between them. Seal your constellation and carry the pattern with you.
+Name up to seven intentions and plant each as a star. Tap pairs of stars to draw lines between them. Seal your constellation and carry the pattern with you.
+🌙 Sleep Wind-down — Body Scan
+Tap through seven body zones from head to feet. Each tap asks you to breathe in and release the tension stored there. Designed for the last few minutes before sleep.
+🎯 Focus — Pomodoro Sessions
+Four 5-minute focus sessions with mindful breathing breaks between each. Set an intention before you begin. Track your progress with the ring timer.
+🌈 Colour Breath — Mood Shifting
+Choose a colour — Golden, Ocean, Rose, Forest, or Violet. Inhale it for 5 seconds. Exhale its opposite for 6 seconds. Five full cycles shift your inner state.
+💧 Flow State — Rhythm Game
+Ripples appear and expand on a dark canvas. Tap them at their peak — the sweet spot earns combo points. Build your streak and enter the flow.
 
 🎵 Sound
-Every game has its own soundscape, generated in real time via the Web Audio API — no audio files required:
-GameSoundStill WatersLayered ambient drone, Solfeggio frequencies, phase tonesEmber MindWhite-noise crackle as letters burn, rising chord on ashRootAscending C major notes per sense, scale cascade on completeDriftDescending water-drop pitch per catch, cycling through 5 notesConstellationScale notes per star, chord pairs per line, full scale on seal
-Tap the 🔔 button in any game to toggle sound on/off.
+Every game has a real-time Web Audio soundscape — no audio files required. Tap 🔔 in any game to toggle sound.
+GameSoundStill WatersLayered ambient drone tuned to Solfeggio frequenciesEmber MindNoise crackle as letters burn, rising chord on ashRootAscending C major notes per tap, cascade on completeDriftDescending water-drop pitch per catchConstellationScale notes per star, chord pairs per line drawnSleep Wind-downSoft chords on each zone release, scale cascade at endFocusSubtle tick each second, break chime between sessionsColour BreathPhase tone on each shift, chord on completionFlow StatePitched hit tones (higher with streak), low note on miss
 
 📱 Add to Home Screen
-For the best experience, add Inner Worlds to your phone's home screen — it runs like a native app with no browser chrome.
 iPhone: Safari → Share → Add to Home Screen
-Android: Chrome → ⋮ menu → Add to Home Screen
+Android: Chrome → ⋮ → Add to Home Screen
 
 🚀 Play It
 Open Inner Worlds →
-(Replace YOUR_USERNAME with your GitHub username)
+
 
 🛠 Built With
-
-Pure HTML, CSS, and JavaScript — zero dependencies
-Web Audio API for all sound synthesis
-Canvas API for particle effects, river waves, and star rendering
-navigator.vibrate() for haptic feedback on mobile
-Google Fonts: Cormorant Garamond, Cinzel Decorative, Playfair Display, IM Fell English
-
+Pure HTML · CSS · JavaScript — zero dependencies · Web Audio API · Canvas API · Google Fonts
 
 📄 License
 MIT — free to use, share, and adapt.
