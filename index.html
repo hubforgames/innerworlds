@@ -13,302 +13,227 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:#070a0f;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 #root{position:fixed;inset:0;overflow:hidden;}
-
-/* ── SHARED UTILS ── */
 .hidden{display:none!important;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeOut{to{opacity:0;}}
 @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes pulseRing{0%{transform:scale(1);opacity:0.5}100%{transform:scale(1.9);opacity:0}}
 @keyframes shimmer{0%,100%{opacity:0.45}50%{opacity:1}}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-@keyframes twinkle{0%,100%{opacity:0.15}50%{opacity:0.85}}
 @keyframes rippleOut{0%{transform:scale(1);opacity:0.8}100%{transform:scale(20);opacity:0}}
 @keyframes emberFloat{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
-@keyframes leafFall{0%{transform:translate(0,0) rotate(var(--r0))}100%{transform:translate(var(--lx),calc(var(--ly) + 100vh)) rotate(var(--r1))}}
-@keyframes starPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.3);opacity:1}100%{transform:scale(1);opacity:1}}
-
-/* ── CANVAS LAYER ── */
+@keyframes leafFall{0%{transform:translate(0,0) rotate(var(--r0))}100%{transform:translate(var(--lx),calc(var(--ly) + 110vh)) rotate(var(--r1))}}
 #bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
-
-/* ── HUB (main menu) ── */
-#hub{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:48px 20px 40px;background:#070a0f;transition:background 1s;}
+.gc-canvas{position:absolute;inset:0;border-radius:14px;pointer-events:none;opacity:0.6;z-index:0;}
+/* HUB */
+#hub{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;overflow-y:auto;padding:40px 20px 40px;background:transparent;}
 #hub.hidden{display:none!important;}
-
-.hub-title{font-family:'Cinzel Decorative',serif;font-size:32px;color:#e8eaf0;line-height:1.2;text-align:center;margin-bottom:4px;animation:fadeUp 0.8s ease;}
-.hub-sub{font-size:13px;color:rgba(200,210,230,0.4);font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:0.1em;text-align:center;margin-bottom:32px;animation:fadeUp 1s ease;}
-
-.games-grid{display:flex;flex-direction:column;gap:14px;width:100%;max-width:400px;animation:fadeUp 0.9s ease;}
-
-.game-card{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:18px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.03);cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
-.game-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.3s;}
-.game-card:hover{transform:translateY(-2px);}
-.game-card:hover::before{opacity:1;}
-.game-card:active{transform:scale(0.98);}
-
-.gc-icon{font-size:32px;flex-shrink:0;filter:drop-shadow(0 0 10px rgba(255,255,255,0.2));}
-.gc-info{flex:1;text-align:left;}
-.gc-name{font-family:'Cinzel Decorative',serif;font-size:16px;margin-bottom:3px;}
-.gc-desc{font-size:12px;font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(200,210,230,0.45);line-height:1.4;}
-.gc-arrow{font-size:18px;opacity:0.3;flex-shrink:0;}
-
-/* Card themes */
-.card-waters{border-color:rgba(127,219,202,0.18);background:rgba(127,219,202,0.04);}
-.card-waters::before{background:radial-gradient(circle at 0 50%,rgba(127,219,202,0.08),transparent);}
-.card-waters .gc-name{color:#a8eddf;}
-.card-ember{border-color:rgba(255,107,26,0.18);background:rgba(255,107,26,0.04);}
-.card-ember::before{background:radial-gradient(circle at 0 50%,rgba(255,107,26,0.08),transparent);}
-.card-ember .gc-name{color:#ffab70;}
-.card-root{border-color:rgba(134,197,107,0.18);background:rgba(134,197,107,0.04);}
-.card-root::before{background:radial-gradient(circle at 0 50%,rgba(134,197,107,0.08),transparent);}
-.card-root .gc-name{color:#a8d885;}
-.card-drift{border-color:rgba(130,180,240,0.18);background:rgba(130,180,240,0.04);}
-.card-drift::before{background:radial-gradient(circle at 0 50%,rgba(130,180,240,0.08),transparent);}
-.card-drift .gc-name{color:#a8ccf0;}
-.card-constellation{border-color:rgba(250,220,100,0.18);background:rgba(250,220,100,0.04);}
-.card-constellation::before{background:radial-gradient(circle at 0 50%,rgba(250,220,100,0.08),transparent);}
-.card-constellation .gc-name{color:#fde68a;}
-
-.hub-footer{margin-top:24px;font-size:11px;color:rgba(200,210,230,0.2);font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:0.15em;text-align:center;}
-
-/* ── GAME WRAPPER ── */
+.hub-title{font-family:'Cinzel Decorative',serif;font-size:28px;color:#e8eaf0;line-height:1.2;text-align:center;margin-bottom:4px;animation:fadeUp 0.8s ease;}
+.hub-sub{font-size:13px;color:rgba(200,210,230,0.35);font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:0.1em;text-align:center;margin-bottom:24px;}
+.games-grid{display:flex;flex-direction:column;gap:10px;width:100%;max-width:400px;}
+.game-card{display:flex;align-items:center;gap:13px;padding:14px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.025);cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;}
+.game-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.25s;}
+.game-card:hover::before{opacity:1;} .game-card:active{transform:scale(0.98);}
+.gc-icon{font-size:26px;flex-shrink:0;} .gc-info{flex:1;text-align:left;} .gc-arrow{font-size:15px;opacity:0.2;flex-shrink:0;}
+.gc-name{font-family:'Cinzel Decorative',serif;font-size:13px;margin-bottom:2px;}
+.gc-desc{font-size:11px;font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(200,210,230,0.38);line-height:1.35;}
+.card-waters .gc-name{color:#a8eddf;} .card-waters{border-color:rgba(127,219,202,0.15);} .card-waters::before{background:radial-gradient(circle at 0 50%,rgba(127,219,202,0.06),transparent);}
+.card-ember .gc-name{color:#ffab70;} .card-ember{border-color:rgba(255,107,26,0.15);} .card-ember::before{background:radial-gradient(circle at 0 50%,rgba(255,107,26,0.06),transparent);}
+.card-root .gc-name{color:#a8d885;} .card-root{border-color:rgba(134,197,107,0.15);} .card-root::before{background:radial-gradient(circle at 0 50%,rgba(134,197,107,0.06),transparent);}
+.card-drift .gc-name{color:#a8ccf0;} .card-drift{border-color:rgba(130,180,240,0.15);} .card-drift::before{background:radial-gradient(circle at 0 50%,rgba(130,180,240,0.06),transparent);}
+.card-constellation .gc-name{color:#fde68a;} .card-constellation{border-color:rgba(250,220,100,0.15);} .card-constellation::before{background:radial-gradient(circle at 0 50%,rgba(250,220,100,0.06),transparent);}
+.card-sleep .gc-name{color:#c4b0f0;} .card-sleep{border-color:rgba(160,130,220,0.15);} .card-sleep::before{background:radial-gradient(circle at 0 50%,rgba(160,130,220,0.06),transparent);}
+.card-focus .gc-name{color:#f5c842;} .card-focus{border-color:rgba(240,180,60,0.15);} .card-focus::before{background:radial-gradient(circle at 0 50%,rgba(240,180,60,0.06),transparent);}
+.card-colour .gc-name{color:#e8a0e8;} .card-colour{border-color:rgba(200,100,200,0.15);} .card-colour::before{background:radial-gradient(circle at 0 50%,rgba(200,100,200,0.06),transparent);}
+.card-flow .gc-name{color:#80e0e0;} .card-flow{border-color:rgba(60,200,200,0.15);} .card-flow::before{background:radial-gradient(circle at 0 50%,rgba(60,200,200,0.06),transparent);}
+.card-weather .gc-name{color:#b0d4f0;} .card-weather{border-color:rgba(140,190,230,0.15);} .card-weather::before{background:radial-gradient(circle at 0 50%,rgba(140,190,230,0.06),transparent);}
+.hub-footer{margin-top:18px;font-size:11px;color:rgba(200,210,230,0.12);font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:0.15em;text-align:center;}
+/* GAME WRAPPER */
 #game-wrapper{position:fixed;inset:0;z-index:20;display:none;}
 #game-wrapper.active{display:block;}
-.back-btn{position:absolute;top:16px;left:16px;z-index:100;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background 0.2s;color:rgba(255,255,255,0.6);}
-.back-btn:hover{background:rgba(255,255,255,0.12);}
-
-/* ── GAME SCREEN BASE ── */
+.back-btn{position:absolute;top:16px;left:16px;z-index:100;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:rgba(255,255,255,0.6);transition:background 0.2s;}
+#snd-btn{position:absolute;top:16px;right:16px;z-index:100;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;}
+/* SCREENS */
 .game-screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow:hidden;}
-.game-screen.active{display:flex;animation:fadeIn 0.5s ease;}
-.game-inner{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;max-width:420px;text-align:center;position:relative;z-index:5;}
-
-/* ── SHARED COMPONENTS ── */
+.game-screen.active{display:flex;animation:fadeIn 0.4s ease;}
+.game-inner{display:flex;flex-direction:column;align-items:center;gap:15px;width:100%;max-width:420px;text-align:center;position:relative;z-index:5;}
 .g-label{font-size:10px;letter-spacing:0.35em;text-transform:uppercase;opacity:0.6;}
-.g-title{font-family:'Cinzel Decorative',serif;font-size:28px;line-height:1.2;}
+.g-title{font-family:'Cinzel Decorative',serif;font-size:26px;line-height:1.2;}
 .g-sub{font-size:14px;font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(200,220,215,0.55);line-height:1.7;}
 .g-mantra{font-size:14px;font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(200,220,215,0.5);animation:shimmer 4s ease-in-out infinite;min-height:20px;}
 .g-stats{display:flex;gap:32px;}
 .g-stat{text-align:center;}
 .g-stat-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;}
 .g-stat-lbl{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;opacity:0.4;margin-top:2px;}
-
-.g-btn{padding:14px 44px;background:transparent;border-radius:40px;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;}
+.g-btn{padding:13px 38px;background:transparent;border-radius:40px;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;transition:all 0.3s;}
+.g-btn:hover{transform:translateY(-1px);}
 .g-btn-ghost{background:none;border-radius:40px;font-family:'Cormorant Garamond',serif;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;color:rgba(200,220,215,0.3);border:none;padding:6px 16px;}
-
-/* ═══════════════════════════════════════════
-   GAME 1 — STILL WATERS
-═══════════════════════════════════════════ */
+/* WATERS */
 #g-waters{background:#0a1628;transition:background 1.5s;}
-.w-level-dots{display:flex;gap:10px;}
-.w-dot{height:3px;border-radius:2px;background:rgba(255,255,255,0.15);transition:all 0.6s;}
 .w-orb-wrap{position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center;}
-.w-ring{position:absolute;border-radius:50%;border:1px solid #7fdbca;transition:opacity 0.5s,transform 0.15s;}
+.w-ring{position:absolute;border-radius:50%;border:1px solid #7fdbca;transition:opacity 0.5s;}
 #w-orb{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#a8eddf,#7fdbca 55%,#0a1628);transition:transform 0.15s ease-out,box-shadow 0.3s;display:flex;align-items:center;justify-content:center;font-size:16px;color:rgba(10,22,40,0.6);}
-.w-breath-label{font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;color:#a8eddf;transition:color 0.6s;}
-.w-progress-wrap{width:150px;height:2px;background:rgba(255,255,255,0.1);border-radius:1px;margin:6px auto 0;overflow:hidden;}
-#w-progress{height:100%;background:#7fdbca;width:0%;transition:width 0.1s linear;}
+.w-breath-label{font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:#a8eddf;}
+.w-progress-wrap{width:150px;height:2px;background:rgba(255,255,255,0.1);border-radius:1px;margin:4px auto 0;overflow:hidden;}
+#w-progress{height:100%;background:#7fdbca;width:0%;}
 .ripple-dot{position:absolute;width:10px;height:10px;margin:-5px;border-radius:50%;border:1.5px solid #7fdbca;pointer-events:none;animation:rippleOut 1.2s ease-out forwards;z-index:5;}
-
-/* ═══════════════════════════════════════════
-   GAME 2 — EMBER MIND
-═══════════════════════════════════════════ */
-#g-ember{background:#0e0802;font-family:'IM Fell English',Georgia,serif;}
-#ember-canvas{position:absolute;inset:0;pointer-events:none;}
-.e-paper{width:100%;background:linear-gradient(135deg,#1e1308,#160e05);border:1px solid rgba(196,168,130,0.15);border-radius:14px;padding:18px;position:relative;}
-.e-paper::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,26,0.2),transparent);}
-#e-input{width:100%;background:transparent;border:none;outline:none;color:#f0e6d0;font-family:'IM Fell English',serif;font-size:17px;line-height:1.7;resize:none;min-height:90px;caret-color:#ff6b1a;font-style:italic;}
+/* EMBER */
+#g-ember{background:#0e0802;}
+.e-paper{width:100%;background:linear-gradient(135deg,#1e1308,#160e05);border:1px solid rgba(196,168,130,0.15);border-radius:14px;padding:16px;}
+#e-input{width:100%;background:transparent;border:none;outline:none;color:#f0e6d0;font-family:'IM Fell English',serif;font-size:16px;line-height:1.7;resize:none;min-height:80px;caret-color:#ff6b1a;font-style:italic;}
 #e-input::placeholder{color:rgba(240,230,208,0.2);font-style:italic;}
-.e-charbar{height:2px;background:rgba(255,255,255,0.06);border-radius:1px;margin-top:10px;overflow:hidden;}
+.e-charbar{height:2px;background:rgba(255,255,255,0.06);border-radius:1px;margin-top:8px;overflow:hidden;}
 #e-charfill{height:100%;background:linear-gradient(90deg,#ff3d00,#ff6b1a,#ffab00);width:0%;transition:width 0.2s;}
-.e-burn-btn{width:100%;padding:15px;background:linear-gradient(135deg,#8b2200,#cc4400,#ff6b1a);border:none;border-radius:12px;color:#fff8f0;font-family:'Playfair Display',serif;font-size:16px;font-style:italic;cursor:pointer;transition:all 0.3s;}
+.e-burn-btn{width:100%;padding:13px;background:linear-gradient(135deg,#8b2200,#cc4400,#ff6b1a);border:none;border-radius:12px;color:#fff8f0;font-family:'Playfair Display',serif;font-size:15px;font-style:italic;cursor:pointer;transition:all 0.3s;}
 .e-burn-btn:disabled{opacity:0.3;cursor:not-allowed;}
-.e-burn-btn:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(255,107,26,0.5);}
-.e-skip{font-size:12px;color:rgba(240,230,208,0.2);cursor:pointer;font-style:italic;text-decoration:underline;text-underline-offset:3px;}
-#e-burning-text{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:#f0e6d0;max-width:300px;line-height:1.5;}
+.e-burn-btn:not(:disabled):hover{box-shadow:0 8px 28px rgba(255,107,26,0.5);}
+.e-skip{font-size:12px;color:rgba(240,230,208,0.2);cursor:pointer;font-style:italic;text-decoration:underline;font-family:'IM Fell English',serif;}
 .e-char{display:inline;}
 .e-char.burned{color:transparent;text-shadow:0 0 8px rgba(255,107,26,0.9);}
 .e-char.ash{color:rgba(139,115,85,0.25);}
-.e-mantra-box{padding:18px 24px;background:rgba(255,107,26,0.04);border:1px solid rgba(196,168,130,0.12);border-radius:14px;max-width:300px;position:relative;}
-.e-mantra-box::before{content:'"';position:absolute;top:-12px;left:14px;font-family:'Playfair Display',serif;font-size:48px;color:rgba(255,107,26,0.12);line-height:1;}
-#e-mantra-text{font-family:'Playfair Display',serif;font-size:18px;font-style:italic;color:#f0e6d0;line-height:1.5;}
-.e-btn{padding:13px 38px;background:transparent;border:1px solid rgba(255,107,26,0.35);border-radius:40px;color:rgba(240,230,208,0.7);font-family:'IM Fell English',serif;font-size:13px;letter-spacing:0.15em;cursor:pointer;transition:all 0.3s;}
-.e-btn:hover{background:rgba(255,107,26,0.08);color:#f0e6d0;}
-
-/* ═══════════════════════════════════════════
-   GAME 3 — ROOT (5 SENSES GROUNDING)
-═══════════════════════════════════════════ */
+.e-mantra-box{padding:16px 20px;background:rgba(255,107,26,0.04);border:1px solid rgba(196,168,130,0.12);border-radius:14px;max-width:300px;}
+#e-mantra-text{font-family:'Playfair Display',serif;font-size:17px;font-style:italic;color:#f0e6d0;line-height:1.5;}
+.e-btn{padding:12px 34px;background:transparent;border:1px solid rgba(255,107,26,0.35);border-radius:40px;color:rgba(240,230,208,0.7);font-family:'IM Fell English',serif;font-size:13px;letter-spacing:0.15em;cursor:pointer;transition:all 0.3s;}
+/* ROOT */
 #g-root{background:#0a1205;}
-.r-sense-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:340px;}
-.r-sense-card{padding:20px 12px;background:rgba(134,197,107,0.04);border:1px solid rgba(134,197,107,0.12);border-radius:16px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;}
-.r-sense-card.active{background:rgba(134,197,107,0.12);border-color:rgba(134,197,107,0.4);transform:scale(0.97);}
+.r-sense-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px;}
+.r-sense-card{padding:16px 10px;background:rgba(134,197,107,0.04);border:1px solid rgba(134,197,107,0.12);border-radius:14px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;text-align:center;}
 .r-sense-card.done{background:rgba(134,197,107,0.08);border-color:rgba(134,197,107,0.25);opacity:0.6;cursor:default;}
-.r-sense-card.done::after{content:'✓';position:absolute;top:8px;right:10px;font-size:12px;color:rgba(134,197,107,0.6);}
-.r-sense-icon{font-size:28px;margin-bottom:6px;}
-.r-sense-name{font-family:'Cormorant Garamond',serif;font-size:13px;color:#a8d885;letter-spacing:0.1em;}
-.r-sense-prompt{font-size:11px;color:rgba(168,216,133,0.45);font-style:italic;margin-top:3px;line-height:1.4;}
-.r-center-card{grid-column:1/-1;padding:18px;background:rgba(134,197,107,0.04);border:1px solid rgba(134,197,107,0.12);border-radius:16px;cursor:pointer;transition:all 0.3s;}
-.r-center-card.active{background:rgba(134,197,107,0.12);border-color:rgba(134,197,107,0.4);}
+.r-sense-card.done::after{content:'✓';position:absolute;top:6px;right:8px;font-size:11px;color:rgba(134,197,107,0.6);}
+.r-center-card{grid-column:1/-1;padding:14px;background:rgba(134,197,107,0.04);border:1px solid rgba(134,197,107,0.12);border-radius:14px;cursor:pointer;transition:all 0.3s;text-align:center;}
 .r-center-card.done{background:rgba(134,197,107,0.08);border-color:rgba(134,197,107,0.25);opacity:0.6;cursor:default;}
-.r-center-card.done::after{content:'✓';float:right;font-size:12px;color:rgba(134,197,107,0.6);}
-.r-progress-row{display:flex;gap:8px;}
-.r-pip{width:28px;height:3px;border-radius:2px;background:rgba(134,197,107,0.15);transition:all 0.4s;}
+.r-sense-icon{font-size:22px;margin-bottom:4px;} .r-sense-name{font-family:'Cormorant Garamond',serif;font-size:12px;color:#a8d885;letter-spacing:0.1em;}
+.r-pip{width:24px;height:3px;border-radius:2px;background:rgba(134,197,107,0.15);display:inline-block;transition:all 0.4s;margin:0 3px;}
 .r-pip.done{background:#86c56b;}
-.r-affirmation{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:#a8d885;max-width:280px;line-height:1.6;animation:fadeUp 0.5s ease;}
-.r-ripple{position:absolute;inset:0;border-radius:16px;background:rgba(134,197,107,0.2);animation:fadeIn 0.1s ease forwards,fadeOut 0.4s 0.1s ease forwards;}
-@keyframes fadeOut{to{opacity:0;transform:scale(1.05);}}
-
-/* ═══════════════════════════════════════════
-   GAME 4 — DRIFT (LEAF RIVER)
-═══════════════════════════════════════════ */
+.r-affirmation{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:#a8d885;max-width:280px;line-height:1.6;animation:fadeUp 0.5s ease;}
+.r-ripple{position:absolute;inset:0;border-radius:14px;background:rgba(134,197,107,0.2);animation:fadeIn 0.1s ease forwards,fadeOut 0.4s 0.1s ease forwards;}
+/* DRIFT */
 #g-drift{background:#06101a;}
-#drift-canvas{position:absolute;inset:0;}
-.d-instruction{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:rgba(168,200,240,0.55);line-height:1.7;max-width:280px;}
 .d-leaf-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.d-leaf{position:absolute;cursor:pointer;pointer-events:all;font-size:28px;animation:leafFall var(--dur) var(--delay) linear forwards;user-select:none;}
-.d-leaf.caught{animation:none!important;transition:all 0.5s ease;}
-.d-thought-label{position:absolute;font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:rgba(168,200,240,0.7);pointer-events:none;text-align:center;max-width:80px;line-height:1.3;}
-.d-river{position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(to top,rgba(100,160,220,0.08),transparent);pointer-events:none;}
-.d-score-overlay{position:absolute;top:60px;right:20px;text-align:right;z-index:10;}
+.d-leaf{position:absolute;cursor:pointer;pointer-events:all;font-size:26px;animation:leafFall var(--dur) linear forwards;user-select:none;touch-action:none;}
+.d-score-overlay{position:absolute;top:62px;right:20px;text-align:right;z-index:10;}
 .d-score-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:#a8ccf0;}
 .d-score-lbl{font-size:10px;color:rgba(168,200,240,0.35);letter-spacing:0.2em;text-transform:uppercase;}
-.d-timer{position:absolute;top:60px;left:20px;z-index:10;}
+.d-timer{position:absolute;top:62px;left:20px;z-index:10;}
 .d-timer-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:rgba(168,200,240,0.6);}
 .d-timer-lbl{font-size:10px;color:rgba(168,200,240,0.3);letter-spacing:0.2em;text-transform:uppercase;}
-.d-release-flash{position:absolute;inset:0;background:rgba(168,200,240,0.05);pointer-events:none;animation:fadeIn 0.1s ease,fadeOut 0.3s 0.1s ease forwards;}
-
-/* ═══════════════════════════════════════════
-   GAME 5 — CONSTELLATION
-═══════════════════════════════════════════ */
+/* CONSTELLATION */
 #g-constellation{background:#04080f;}
-#const-canvas{position:absolute;inset:0;cursor:crosshair;}
-.c-instructions{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(250,220,100,0.45);line-height:1.6;max-width:280px;}
-.c-intention-label{font-size:11px;color:rgba(250,220,100,0.4);letter-spacing:0.25em;text-transform:uppercase;font-family:'Cormorant Garamond',serif;}
+#const-canvas{position:absolute;inset:0;pointer-events:none;z-index:1;}
+#cs-play{position:absolute;inset:0;z-index:2;cursor:crosshair;}
+.c-name-tag{position:absolute;font-family:'Cormorant Garamond',serif;font-size:10px;font-style:italic;color:rgba(253,230,138,0.6);pointer-events:none;white-space:nowrap;transform:translateX(-50%);z-index:3;}
+.c-add-btn{padding:10px 32px;background:transparent;border:1px solid rgba(250,220,100,0.3);border-radius:40px;color:rgba(253,230,138,0.7);font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:0.2em;cursor:pointer;transition:all 0.3s;}
+.c-add-btn:disabled{opacity:0.3;cursor:not-allowed;}
 #c-intention-input{background:transparent;border:none;border-bottom:1px solid rgba(250,220,100,0.25);outline:none;color:#fde68a;font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;text-align:center;width:100%;max-width:280px;padding:6px 0;caret-color:#fde68a;}
 #c-intention-input::placeholder{color:rgba(250,220,100,0.2);}
-.c-add-btn{padding:11px 36px;background:transparent;border:1px solid rgba(250,220,100,0.3);border-radius:40px;color:rgba(253,230,138,0.7);font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:0.2em;cursor:pointer;transition:all 0.3s;}
-.c-add-btn:hover{background:rgba(250,220,100,0.08);color:#fde68a;}
-.c-add-btn:disabled{opacity:0.3;cursor:not-allowed;}
-.c-name-tag{position:absolute;font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:rgba(253,230,138,0.65);pointer-events:none;white-space:nowrap;}
-.c-complete-constellation{font-size:64px;animation:floatY 3s ease-in-out infinite;}
+/* SLEEP */
+#g-sleep{background:#06040f;}
+.sl-zone{cursor:pointer;transition:all 0.3s;}
+.sl-zone.released{opacity:0.25;cursor:default;pointer-events:none;}
+.sl-instruction{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:rgba(180,160,220,0.65);max-width:260px;line-height:1.7;text-align:center;}
+.sl-pip{width:20px;height:3px;border-radius:2px;background:rgba(160,130,220,0.15);display:inline-block;margin:0 3px;transition:all 0.4s;}
+.sl-pip.done{background:#a090d8;}
+/* FOCUS */
+#g-focus{background:#080a04;}
+#fo-svg{width:180px;height:180px;transform:rotate(-90deg);}
+#fo-track{fill:none;stroke:rgba(240,180,60,0.12);stroke-width:8;}
+#fo-arc{fill:none;stroke:#f5c842;stroke-width:8;stroke-linecap:round;stroke-dasharray:502;stroke-dashoffset:502;transition:stroke-dashoffset 1s linear;}
+.fo-ring-wrap{position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center;}
+.fo-center{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.fo-time{font-family:'Cormorant Garamond',serif;font-size:36px;font-style:italic;color:#f5c842;}
+.fo-phase-lbl{font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(240,180,60,0.5);margin-top:2px;}
+.fo-dot{width:10px;height:10px;border-radius:50%;background:rgba(240,180,60,0.15);transition:all 0.4s;display:inline-block;margin:0 4px;}
+.fo-dot.done{background:#f5c842;} .fo-dot.active{background:#f5c842;box-shadow:0 0 8px #f5c842;}
+.fo-intent-display{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(240,180,60,0.45);max-width:260px;line-height:1.5;}
+#fo-intent-input{background:transparent;border:none;border-bottom:1px solid rgba(240,180,60,0.25);outline:none;color:#f5c842;font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;text-align:center;width:100%;max-width:280px;padding:6px 0;caret-color:#f5c842;}
+#fo-intent-input::placeholder{color:rgba(240,180,60,0.2);}
+/* COLOUR BREATH */
+#g-colour{background:#080810;}
+.cb-orb{width:150px;height:150px;border-radius:50%;transition:all 1s ease;display:flex;align-items:center;justify-content:center;font-size:14px;font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(255,255,255,0.7);}
+.cb-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.cb-chip{padding:7px 16px;border-radius:30px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);cursor:pointer;font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;transition:all 0.3s;color:rgba(255,255,255,0.55);}
+.cb-chip.selected{border-width:1.5px;color:#fff;}
+.cb-bar-wrap{width:180px;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;}
+#cb-bar{height:100%;width:0%;border-radius:2px;transition:width 0.1s linear;}
+/* FLOW STATE */
+#g-flow{background:#030d0d;}
+#flow-canvas{position:absolute;inset:0;}
+.fl-score{position:absolute;top:62px;left:50%;transform:translateX(-50%);text-align:center;z-index:10;pointer-events:none;}
+.fl-score-val{font-family:'Cormorant Garamond',serif;font-size:42px;font-style:italic;color:#80e0e0;}
+.fl-score-lbl{font-size:10px;color:rgba(120,210,210,0.35);letter-spacing:0.2em;text-transform:uppercase;}
+.fl-combo{position:absolute;top:112px;left:50%;transform:translateX(-50%);font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:rgba(128,224,224,0.45);letter-spacing:0.15em;z-index:10;pointer-events:none;}
 </style>
 </head>
 <body>
 <canvas id="bg-canvas"></canvas>
 <div id="root">
-
-<!-- ═══ HUB ═══ -->
+<!-- HUB -->
 <div id="hub">
   <div class="hub-title">Inner<br>Worlds</div>
-  <div class="hub-sub">Five paths to stillness. Choose yours.</div>
+  <div class="hub-sub">Ten paths to stillness.</div>
   <div class="games-grid">
-    <div class="game-card card-waters" onclick="launchGame('waters')">
-      <span class="gc-icon">🌊</span>
-      <div class="gc-info">
-        <div class="gc-name">Still Waters</div>
-        <div class="gc-desc">Breathe with the orb. Expand consciousness through guided cycles.</div>
-      </div>
-      <span class="gc-arrow">›</span>
-    </div>
-    <div class="game-card card-ember" onclick="launchGame('ember')">
-      <span class="gc-icon">🔥</span>
-      <div class="gc-info">
-        <div class="gc-name">Ember Mind</div>
-        <div class="gc-desc">Write your worries. Watch them burn. Rise from the ash.</div>
-      </div>
-      <span class="gc-arrow">›</span>
-    </div>
-    <div class="game-card card-root" onclick="launchGame('root')">
-      <span class="gc-icon">🌿</span>
-      <div class="gc-info">
-        <div class="gc-name">Root</div>
-        <div class="gc-desc">Ground yourself through the 5 senses. Feel the earth beneath you.</div>
-      </div>
-      <span class="gc-arrow">›</span>
-    </div>
-    <div class="game-card card-drift" onclick="launchGame('drift')">
-      <span class="gc-icon">🍃</span>
-      <div class="gc-info">
-        <div class="gc-name">Drift</div>
-        <div class="gc-desc">Catch falling thoughts like leaves. Place them gently in the river.</div>
-      </div>
-      <span class="gc-arrow">›</span>
-    </div>
-    <div class="game-card card-constellation" onclick="launchGame('constellation')">
-      <span class="gc-icon">✨</span>
-      <div class="gc-info">
-        <div class="gc-name">Constellation</div>
-        <div class="gc-desc">Plant intentions as stars. Draw lines to build your inner sky.</div>
-      </div>
-      <span class="gc-arrow">›</span>
-    </div>
+    <div class="game-card card-waters" onclick="launchGame('waters')"><canvas class="gc-canvas" id="gcc-waters"></canvas><span class="gc-icon">🌊</span><div class="gc-info"><div class="gc-name">Still Waters</div><div class="gc-desc">Breathe with the orb through three levels of consciousness.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-ember" onclick="launchGame('ember')"><canvas class="gc-canvas" id="gcc-ember"></canvas><span class="gc-icon">🔥</span><div class="gc-info"><div class="gc-name">Ember Mind</div><div class="gc-desc">Write your worries. Watch them burn. Rise from the ash.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-root" onclick="launchGame('root')"><canvas class="gc-canvas" id="gcc-root"></canvas><span class="gc-icon">🌿</span><div class="gc-info"><div class="gc-name">Root</div><div class="gc-desc">Ground through the 5 senses. Feel the earth beneath you.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-drift" onclick="launchGame('drift')"><canvas class="gc-canvas" id="gcc-drift"></canvas><span class="gc-icon">🍃</span><div class="gc-info"><div class="gc-name">Drift</div><div class="gc-desc">Catch falling thoughts like leaves. Release them to the river.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-constellation" onclick="launchGame('constellation')"><canvas class="gc-canvas" id="gcc-constellation"></canvas><span class="gc-icon">✨</span><div class="gc-info"><div class="gc-name">Constellation</div><div class="gc-desc">Plant intentions as stars. Draw lines between them.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-sleep" onclick="launchGame('sleep')"><canvas class="gc-canvas" id="gcc-sleep"></canvas><span class="gc-icon">🌙</span><div class="gc-info"><div class="gc-name">Sleep Wind-down</div><div class="gc-desc">Body scan from head to toe. Release each zone with breath.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-focus" onclick="launchGame('focus')"><canvas class="gc-canvas" id="gcc-focus"></canvas><span class="gc-icon">🎯</span><div class="gc-info"><div class="gc-name">Focus</div><div class="gc-desc">Four mindful focus sessions with breathing breaks between.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-colour" onclick="launchGame('colour')"><canvas class="gc-canvas" id="gcc-colour"></canvas><span class="gc-icon">🌈</span><div class="gc-info"><div class="gc-name">Colour Breath</div><div class="gc-desc">Inhale a colour. Exhale its opposite. Shift your mood.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-flow" onclick="launchGame('flow')"><canvas class="gc-canvas" id="gcc-flow"></canvas><span class="gc-icon">💧</span><div class="gc-info"><div class="gc-name">Flow State</div><div class="gc-desc">Tap expanding ripples in rhythm. Enter the flow.</div></div><span class="gc-arrow">›</span></div>
+    <div class="game-card card-weather" onclick="launchGame('weather')"><canvas class="gc-canvas" id="gcc-weather"></canvas><span class="gc-icon">🌦️</span><div class="gc-info"><div class="gc-name">Weather Mind</div><div class="gc-desc">Name your inner weather. Watch it slowly change.</div></div><span class="gc-arrow">›</span></div>
   </div>
-  <div class="hub-footer">inner worlds · five practices · one breath</div>
+  <div class="hub-footer">inner worlds · ten practices · one breath</div>
 </div>
-
-<!-- ═══ GAME WRAPPER ═══ -->
+<!-- GAME WRAPPER -->
 <div id="game-wrapper">
   <div class="back-btn" onclick="returnToHub()">←</div>
-  <div id="snd-btn" onclick="toggleSound()" style="position:absolute;top:16px;right:16px;z-index:100;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;">🔔</div>
-
-  <!-- ══ STILL WATERS ══ -->
+  <div id="snd-btn" onclick="toggleSound()">🔔</div>
+  <!-- STILL WATERS -->
   <div id="g-waters" class="game-screen">
-    <canvas id="waters-canvas" style="position:absolute;inset:0;pointer-events:none;"></canvas>
-    <!-- WATERS HOME -->
     <div id="ws-home" class="game-screen active" style="background:transparent;">
       <div class="game-inner">
         <div class="g-label" style="color:#7fdbca">Still Waters</div>
-        <div class="g-title" style="color:#e8f4f0">Breathe<br>& Be</div>
-        <div style="position:relative;width:100px;height:100px;display:flex;align-items:center;justify-content:center;animation:floatY 3s ease-in-out infinite;">
-          <div style="position:absolute;width:100px;height:100px;border-radius:50%;border:1.5px solid rgba(127,219,202,0.3);animation:pulseRing 2.5s ease-out infinite;"></div>
-          <div style="width:66px;height:66px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a8eddf,#2a8b78);box-shadow:0 0 30px 8px rgba(127,219,202,0.3);"></div>
-        </div>
+        <div class="g-title" style="color:#e8f4f0">Breathe<br>&amp; Be</div>
+        <div style="position:relative;width:90px;height:90px;display:flex;align-items:center;justify-content:center;animation:floatY 3s ease-in-out infinite;"><div style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(127,219,202,0.3);animation:pulseRing 2.5s ease-out infinite;"></div><div style="width:60px;height:60px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#a8eddf,#2a8b78);box-shadow:0 0 24px 6px rgba(127,219,202,0.3);"></div></div>
         <div class="g-sub">Follow the orb through 3 levels of consciousness. Each breath brings you deeper.</div>
         <button class="g-btn" style="border:1.5px solid rgba(127,219,202,0.5);color:#a8eddf;" onclick="watersStart()">Begin Journey</button>
       </div>
     </div>
-    <!-- WATERS BREATHE -->
     <div id="ws-breathe" class="game-screen" style="background:transparent;">
       <div class="game-inner">
-        <div class="w-level-dots" id="w-dots"></div>
+        <div style="display:flex;gap:10px;" id="w-dots"></div>
         <div class="g-label" id="w-level-lbl" style="color:#7fdbca">Level 1 — Awakening</div>
-        <div class="w-orb-wrap" id="w-orb-wrap">
+        <div class="w-orb-wrap">
           <div class="w-ring" id="wr3" style="width:195px;height:195px;opacity:0.12;"></div>
           <div class="w-ring" id="wr2" style="width:175px;height:175px;opacity:0.18;"></div>
           <div class="w-ring" id="wr1" style="width:155px;height:155px;opacity:0.3;"></div>
           <div id="w-orb">·</div>
         </div>
-        <div>
-          <div class="w-breath-label" id="w-breath-lbl">Breathe In</div>
-          <div class="w-progress-wrap"><div id="w-progress"></div></div>
-        </div>
+        <div><div class="w-breath-label" id="w-breath-lbl">Breathe In</div><div class="w-progress-wrap"><div id="w-progress"></div></div></div>
         <div class="g-mantra" id="w-mantra">"You are present."</div>
         <div class="g-stats">
           <div class="g-stat"><div class="g-stat-val" id="w-stat-b" style="color:#a8eddf;">0</div><div class="g-stat-lbl">Breaths</div></div>
-          <div class="g-stat"><div class="g-stat-val" id="w-stat-s" style="color:#a8eddf;">0</div><div class="g-stat-lbl">✦ Presence</div></div>
+          
         </div>
-        <div style="font-size:10px;color:rgba(180,220,215,0.2);letter-spacing:0.15em;text-transform:uppercase;">Touch anywhere · create ripples</div>
       </div>
     </div>
-    <!-- WATERS COMPLETE -->
     <div id="ws-done" class="game-screen" style="background:transparent;">
       <div class="game-inner">
         <div class="g-label" style="color:#f5a97f">Complete</div>
         <div class="g-title" style="color:#ffd0b0">You have<br>arrived.</div>
-        <div style="width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffd0b0,#f5a97f);box-shadow:0 0 30px 12px rgba(245,169,127,0.3);animation:floatY 3s ease-in-out infinite;"></div>
+        <div style="width:50px;height:50px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ffd0b0,#f5a97f);box-shadow:0 0 28px 10px rgba(245,169,127,0.3);animation:floatY 3s ease-in-out infinite;"></div>
         <div class="g-stats">
-          <div class="g-stat"><div class="g-stat-val" id="w-final-s" style="color:#ffd0b0;">0</div><div class="g-stat-lbl">Presence</div></div>
-          <div class="g-stat"><div class="g-stat-val" id="w-final-b" style="color:#ffd0b0;">0</div><div class="g-stat-lbl">Breaths</div></div>
+          
+          <div class="g-stat"><div class="g-stat-val" id="w-final-b" style="color:#ffd0b0;">21</div><div class="g-stat-lbl">Breaths</div></div>
         </div>
         <button class="g-btn" style="border:1.5px solid rgba(245,169,127,0.4);color:#ffd0b0;" onclick="watersStart()">Journey Again</button>
         <button class="g-btn-ghost" onclick="showWatersScreen('ws-home')">Back</button>
       </div>
     </div>
   </div>
-
-  <!-- ══ EMBER MIND ══ -->
-  <div id="g-ember" class="game-screen">
-    <canvas id="ember-canvas"></canvas>
-    <!-- EMBER HOME -->
+  <!-- EMBER MIND -->
+  <div id="g-ember" class="game-screen" style="background:#0e0802;">
     <div id="es-home" class="game-screen active" style="background:transparent;">
       <div class="game-inner">
         <div style="font-size:48px;animation:floatY 2.5s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(255,107,26,0.6));">🔥</div>
@@ -317,62 +242,42 @@ html,body{height:100%;overflow:hidden;background:#070a0f;-webkit-tap-highlight-c
         <button class="g-btn" style="border:1.5px solid rgba(255,107,26,0.5);color:#ffab70;font-family:'IM Fell English',serif;" onclick="emberStart()">Light the Fire</button>
       </div>
     </div>
-    <!-- EMBER WRITE -->
     <div id="es-write" class="game-screen" style="background:transparent;">
       <div class="game-inner">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
-          <span style="font-size:11px;color:rgba(240,230,208,0.3);letter-spacing:0.2em;" id="e-round-lbl">Release 1 of 5</span>
-          <span style="font-size:11px;color:#ff8c42;" id="e-score-lbl">✦ 0</span>
-        </div>
-        <div style="font-size:11px;color:rgba(240,230,208,0.35);letter-spacing:0.25em;text-transform:uppercase;align-self:flex-start;font-family:'IM Fell English',serif;" id="e-prompt">What thought weighs on you?</div>
-        <div class="e-paper">
-          <textarea id="e-input" placeholder="Write it here… let it out…" maxlength="120" rows="4" oninput="eOnType()"></textarea>
-          <div class="e-charbar"><div id="e-charfill"></div></div>
-        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:center;"><span style="font-size:11px;color:rgba(240,230,208,0.3);letter-spacing:0.2em;" id="e-round-lbl">Release 1 of 5</span></div>
+        <div style="font-size:11px;color:rgba(240,230,208,0.35);letter-spacing:0.2em;text-transform:uppercase;align-self:flex-start;font-family:'IM Fell English',serif;" id="e-prompt">What thought weighs on you?</div>
+        <div class="e-paper"><textarea id="e-input" placeholder="Write it here… let it out…" maxlength="120" rows="4" oninput="eOnType()"></textarea><div class="e-charbar"><div id="e-charfill"></div></div></div>
         <button class="e-burn-btn" id="e-burnbtn" onclick="emberBurn()" disabled>Release to the Flame 🔥</button>
         <span class="e-skip" onclick="emberSkip()">Nothing to write — skip</span>
       </div>
     </div>
-    <!-- EMBER BURNING -->
     <div id="es-burning" class="game-screen" style="background:transparent;">
       <div class="game-inner">
         <div style="font-size:11px;color:rgba(240,230,208,0.3);letter-spacing:0.3em;text-transform:uppercase;font-family:'IM Fell English',serif;">Releasing...</div>
-        <div id="e-burning-text" class="e-burning-text" style="font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:#f0e6d0;max-width:300px;line-height:1.5;"></div>
-        <div style="font-size:13px;color:rgba(240,230,208,0.2);font-style:italic;font-family:'IM Fell English',serif;">Let it go completely</div>
+        <div id="e-burning-text" style="font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:#f0e6d0;max-width:300px;line-height:1.5;"></div>
       </div>
     </div>
-    <!-- EMBER ASH -->
     <div id="es-ash" class="game-screen" style="background:transparent;">
       <div class="game-inner">
-        <div style="font-size:32px;animation:fadeUp 1s ease both;">🪨</div>
+        <div style="font-size:32px;">🪨</div>
         <div style="font-size:10px;color:rgba(196,168,130,0.4);letter-spacing:0.3em;text-transform:uppercase;font-family:'IM Fell English',serif;">Released</div>
         <div id="e-ash-orig" style="font-size:13px;color:rgba(196,168,130,0.3);font-style:italic;text-decoration:line-through;text-decoration-color:rgba(255,107,26,0.3);max-width:260px;line-height:1.5;font-family:'IM Fell English',serif;"></div>
         <div class="e-mantra-box"><div id="e-mantra-text"></div></div>
-        <div style="text-align:center;">
-          <div style="font-family:'Playfair Display',serif;font-size:24px;font-style:italic;color:#ff8c42;" id="e-ash-count">1</div>
-          <div style="font-size:10px;color:rgba(196,168,130,0.4);letter-spacing:0.2em;text-transform:uppercase;margin-top:2px;">thought released</div>
-        </div>
         <button class="e-btn" id="e-next-btn" onclick="emberNext()">Write Another →</button>
       </div>
     </div>
-    <!-- EMBER COMPLETE -->
     <div id="es-done" class="game-screen" style="background:transparent;">
       <div class="game-inner">
         <div style="font-size:52px;animation:floatY 2s ease-in-out infinite;filter:drop-shadow(0 0 24px rgba(255,107,26,0.6));">🕯️</div>
-        <div style="font-family:'Playfair Display',serif;font-size:32px;color:#f0e6d0;font-style:italic;line-height:1.2;">You burn<br>clear.</div>
-        <div class="g-stats">
-          <div class="g-stat"><div class="g-stat-val" id="e-final-r" style="color:#ff8c42;">0</div><div class="g-stat-lbl">Released</div></div>
-          <div class="g-stat"><div class="g-stat-val" id="e-final-s" style="color:#ff8c42;">0</div><div class="g-stat-lbl">✦ Clarity</div></div>
-        </div>
+        <div style="font-family:'Playfair Display',serif;font-size:30px;color:#f0e6d0;font-style:italic;line-height:1.2;">You burn<br>clear.</div>
+        <div class="g-stats"><div class="g-stat"><div class="g-stat-val" id="e-final-r" style="color:#ff8c42;">0</div><div class="g-stat-lbl">Released</div></div></div>
         <button class="g-btn" style="border:1.5px solid rgba(255,107,26,0.4);color:#ffab70;font-family:'IM Fell English',serif;" onclick="emberStart()">Burn Again</button>
         <button class="g-btn-ghost" onclick="showEmberScreen('es-home')">Back</button>
       </div>
     </div>
   </div>
-
-  <!-- ══ ROOT ══ -->
-  <div id="g-root" class="game-screen">
-    <!-- ROOT HOME -->
+  <!-- ROOT -->
+  <div id="g-root" class="game-screen" style="background:#0a1205;">
     <div id="rs-home" class="game-screen active" style="background:transparent;">
       <div class="game-inner">
         <div style="font-size:48px;animation:floatY 3s ease-in-out infinite;">🌿</div>
@@ -381,78 +286,58 @@ html,body{height:100%;overflow:hidden;background:#070a0f;-webkit-tap-highlight-c
         <button class="g-btn" style="border:1.5px solid rgba(134,197,107,0.5);color:#a8d885;" onclick="rootStart()">Ground Yourself</button>
       </div>
     </div>
-    <!-- ROOT SENSE -->
     <div id="rs-sense" class="game-screen" style="background:transparent;">
       <div class="game-inner">
-        <div class="r-progress-row" id="r-pips"></div>
+        <div style="display:flex;justify-content:center;" id="r-pips"></div>
         <div class="g-label" id="r-step-lbl" style="color:#86c56b;">Step 1 of 5</div>
-        <div class="g-sub" id="r-instruction" style="color:rgba(168,216,133,0.6);font-size:15px;max-width:300px;"></div>
+        <div class="g-sub" id="r-instruction" style="color:rgba(168,216,133,0.6);font-size:14px;max-width:300px;"></div>
         <div class="r-sense-grid" id="r-grid"></div>
         <div class="r-affirmation hidden" id="r-affirmation"></div>
       </div>
     </div>
-    <!-- ROOT COMPLETE -->
     <div id="rs-done" class="game-screen" style="background:transparent;">
       <div class="game-inner">
         <div style="font-size:56px;animation:floatY 3s ease-in-out infinite;">🌳</div>
         <div class="g-title" style="color:#a8d885;">You are<br>grounded.</div>
         <div class="g-sub" style="color:rgba(168,216,133,0.5);">You are here. You are real. This moment holds you completely.</div>
-        <div class="g-stats">
-          <div class="g-stat"><div class="g-stat-val" id="r-final-s" style="color:#a8d885;">5</div><div class="g-stat-lbl">Senses</div></div>
-          <div class="g-stat"><div class="g-stat-val" id="r-final-sc" style="color:#a8d885;">0</div><div class="g-stat-lbl">✦ Clarity</div></div>
-        </div>
+        <div class="g-stats"><div class="g-stat"><div class="g-stat-val" style="color:#a8d885;">5</div><div class="g-stat-lbl">Senses</div></div></div>
         <button class="g-btn" style="border:1.5px solid rgba(134,197,107,0.5);color:#a8d885;" onclick="rootStart()">Ground Again</button>
         <button class="g-btn-ghost" onclick="showRootScreen('rs-home')">Back</button>
       </div>
     </div>
   </div>
-
-  <!-- ══ DRIFT ══ -->
-  <div id="g-drift" class="game-screen">
-    <canvas id="drift-canvas"></canvas>
-    <!-- DRIFT HOME -->
+  <!-- DRIFT -->
+  <div id="g-drift" class="game-screen" style="background:#06101a;">
+    <canvas id="drift-canvas" style="position:absolute;inset:0;pointer-events:none;"></canvas>
     <div id="ds-home" class="game-screen active" style="background:transparent;">
       <div class="game-inner">
         <div style="font-size:48px;animation:floatY 3.5s ease-in-out infinite;">🍃</div>
         <div class="g-title" style="color:#a8ccf0;font-family:'Cormorant Garamond',serif;">Drift</div>
-        <div class="g-sub" style="color:rgba(168,200,240,0.55);">Thoughts drift down like autumn leaves. Tap each one to catch it and release it to the river. Let them go.</div>
+        <div class="g-sub" style="color:rgba(168,200,240,0.55);">Thoughts drift down like autumn leaves. Tap each one to catch it and release it to the river.</div>
         <button class="g-btn" style="border:1.5px solid rgba(130,180,240,0.5);color:#a8ccf0;" onclick="driftStart()">Let Go</button>
       </div>
     </div>
-    <!-- DRIFT PLAY -->
     <div id="ds-play" class="game-screen" style="background:transparent;padding:0;">
       <div class="d-leaf-wrap" id="d-leaf-wrap"></div>
-      <div class="d-river"></div>
-      <div class="d-score-overlay">
-        <div class="d-score-val" id="d-score">0</div>
-        <div class="d-score-lbl">Released</div>
-      </div>
-      <div class="d-timer">
-        <div class="d-timer-val" id="d-timer">60</div>
-        <div class="d-timer-lbl">Seconds</div>
-      </div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:90px;background:linear-gradient(to top,rgba(100,160,220,0.07),transparent);pointer-events:none;"></div>
+      <div class="d-score-overlay"><div class="d-score-val" id="d-score">0</div><div class="d-score-lbl">Released</div></div>
+      <div class="d-timer"><div class="d-timer-val" id="d-timer">60</div><div class="d-timer-lbl">Seconds</div></div>
     </div>
-    <!-- DRIFT COMPLETE -->
     <div id="ds-done" class="game-screen" style="background:transparent;">
       <div class="game-inner">
         <div style="font-size:52px;animation:floatY 3s ease-in-out infinite;">🌊</div>
         <div class="g-title" style="color:#a8ccf0;">All flows<br>downstream.</div>
         <div class="g-sub" style="color:rgba(168,200,240,0.5);">You released what was passing through. The river carries it away.</div>
-        <div class="g-stats">
-          <div class="g-stat"><div class="g-stat-val" id="d-final-r" style="color:#a8ccf0;">0</div><div class="g-stat-lbl">Released</div></div>
-          <div class="g-stat"><div class="g-stat-val" id="d-final-m" style="color:#a8ccf0;">0</div><div class="g-stat-lbl">Missed</div></div>
-        </div>
+        <div class="g-stats"><div class="g-stat"><div class="g-stat-val" id="d-final-r" style="color:#a8ccf0;">0</div><div class="g-stat-lbl">Released</div></div><div class="g-stat"><div class="g-stat-val" id="d-final-m" style="color:#a8ccf0;">0</div><div class="g-stat-lbl">Missed</div></div></div>
         <button class="g-btn" style="border:1.5px solid rgba(130,180,240,0.5);color:#a8ccf0;" onclick="driftStart()">Drift Again</button>
         <button class="g-btn-ghost" onclick="showDriftScreen('ds-home')">Back</button>
       </div>
     </div>
   </div>
-
-  <!-- ══ CONSTELLATION ══ -->
-  <div id="g-constellation" class="game-screen">
+  <!-- CONSTELLATION — canvas pointer-events:none, tap handled by #cs-play div -->
+  <div id="g-constellation" class="game-screen" style="background:#04080f;">
     <canvas id="const-canvas"></canvas>
-    <!-- CONST HOME -->
-    <div id="cs-home" class="game-screen active" style="background:transparent;">
+    <div id="cs-home" class="game-screen active" style="background:transparent;z-index:4;">
       <div class="game-inner">
         <div style="font-size:48px;animation:floatY 4s ease-in-out infinite;">✨</div>
         <div class="g-title" style="color:#fde68a;font-family:'Cormorant Garamond',serif;">Constellation</div>
@@ -460,265 +345,554 @@ html,body{height:100%;overflow:hidden;background:#070a0f;-webkit-tap-highlight-c
         <button class="g-btn" style="border:1.5px solid rgba(250,220,100,0.5);color:#fde68a;" onclick="constStart()">Map Your Sky</button>
       </div>
     </div>
-    <!-- CONST PLANT -->
-    <div id="cs-plant" class="game-screen" style="background:transparent;padding:0;">
+    <div id="cs-plant" class="game-screen" style="background:transparent;padding:0;z-index:4;">
       <div style="position:absolute;bottom:28px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:12px;z-index:10;padding:0 24px;">
-        <div class="c-intention-label" id="c-count-lbl">Intention 1 of 7</div>
+        <div style="font-size:11px;color:rgba(250,220,100,0.4);letter-spacing:0.25em;text-transform:uppercase;font-family:'Cormorant Garamond',serif;" id="c-count-lbl">Intention 1 of 7</div>
         <input id="c-intention-input" type="text" placeholder="Name this star…" maxlength="30" autocomplete="off"/>
         <button class="c-add-btn" id="c-add-btn" onclick="constAddStar()" disabled>Plant this Star ✦</button>
       </div>
-      <div style="position:absolute;top:60px;right:20px;z-index:10;text-align:right;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;color:#fde68a;" id="c-stars-count">0</div>
+      <div style="position:absolute;top:62px;right:20px;z-index:10;text-align:right;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:#fde68a;" id="c-stars-count">0</div>
         <div style="font-size:10px;color:rgba(253,230,138,0.35);letter-spacing:0.2em;text-transform:uppercase;">Stars</div>
       </div>
     </div>
-    <!-- CONST CONNECT -->
-    <div id="cs-connect" class="game-screen" style="background:transparent;padding:0;">
-      <div style="position:absolute;bottom:28px;left:0;right:0;text-align:center;z-index:10;padding:0 24px;">
-        <div style="font-size:12px;color:rgba(253,230,138,0.4);font-family:'Cormorant Garamond',serif;font-style:italic;margin-bottom:12px;" id="c-connect-hint">Tap two stars to connect them</div>
-        <button class="c-add-btn" onclick="constComplete()">Seal this Constellation ✦</button>
+    <!-- Tap layer for connect phase — sits on top of canvas -->
+    <div id="cs-play" class="game-screen" style="background:transparent;padding:0;z-index:4;" onclick="constHandleTap(event)">
+      <div style="position:absolute;bottom:28px;left:0;right:0;text-align:center;z-index:10;padding:0 24px;pointer-events:none;">
+        <div style="font-size:12px;color:rgba(253,230,138,0.4);font-family:'Cormorant Garamond',serif;font-style:italic;margin-bottom:12px;" id="c-connect-hint">Tap a star to select it</div>
+        <button class="c-add-btn" style="pointer-events:all;" onclick="event.stopPropagation();constComplete()">Seal this Constellation ✦</button>
       </div>
     </div>
-    <!-- CONST COMPLETE -->
-    <div id="cs-done" class="game-screen" style="background:transparent;">
+    <div id="cs-done" class="game-screen" style="background:rgba(4,8,15,0.92);z-index:5;">
       <div class="game-inner">
-        <div class="c-complete-constellation">🌌</div>
+        <div style="font-size:64px;animation:floatY 3s ease-in-out infinite;">🌌</div>
         <div class="g-title" style="color:#fde68a;">Your sky<br>is mapped.</div>
-        <div class="g-sub" style="color:rgba(253,230,138,0.5);">These intentions live in you. Return to this constellation whenever you need direction.</div>
-        <div class="g-stats">
-          <div class="g-stat"><div class="g-stat-val" id="c-final-stars" style="color:#fde68a;">0</div><div class="g-stat-lbl">Stars</div></div>
-          <div class="g-stat"><div class="g-stat-val" id="c-final-lines" style="color:#fde68a;">0</div><div class="g-stat-lbl">Lines</div></div>
-        </div>
+        <div class="g-sub" style="color:rgba(253,230,138,0.5);">These intentions live in you. Return whenever you need direction.</div>
+        <div class="g-stats"><div class="g-stat"><div class="g-stat-val" id="c-final-stars" style="color:#fde68a;">0</div><div class="g-stat-lbl">Stars</div></div><div class="g-stat"><div class="g-stat-val" id="c-final-lines" style="color:#fde68a;">0</div><div class="g-stat-lbl">Lines</div></div></div>
         <div id="c-final-intentions" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:300px;"></div>
         <button class="g-btn" style="border:1.5px solid rgba(250,220,100,0.5);color:#fde68a;" onclick="constStart()">New Sky</button>
         <button class="g-btn-ghost" onclick="showConstScreen('cs-home')">Back</button>
       </div>
     </div>
   </div>
+  <!-- SLEEP WIND-DOWN -->
+  <div id="g-sleep" class="game-screen" style="background:#06040f;">
+    <div id="sl-home" class="game-screen active" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:48px;animation:floatY 4s ease-in-out infinite;">🌙</div>
+        <div class="g-title" style="color:#c4b0f0;font-family:'Cormorant Garamond',serif;">Sleep<br>Wind-down</div>
+        <div class="g-sub" style="color:rgba(180,160,220,0.55);">Scan your body from head to toe. Tap each zone and breathe out the tension stored there.</div>
+        <button class="g-btn" style="border:1.5px solid rgba(160,130,220,0.5);color:#c4b0f0;" onclick="sleepStart()">Begin Scan</button>
+      </div>
+    </div>
+    <div id="sl-scan" class="game-screen" style="background:transparent;">
+      <div class="game-inner" style="gap:12px;">
+        <div style="display:flex;justify-content:center;" id="sl-pips"></div>
+        <div class="g-label" id="sl-zone-lbl" style="color:#a090d8;">Head &amp; Face</div>
+        <svg viewBox="0 0 120 210" style="width:140px;height:210px;overflow:visible;" id="sl-body-svg">
+          <ellipse id="slz-0" class="sl-zone" cx="60" cy="20" rx="18" ry="18" fill="rgba(160,130,220,0.22)" stroke="rgba(160,130,220,0.5)" stroke-width="1.5"/>
+          <rect id="slz-1" class="sl-zone" x="44" y="38" width="32" height="14" rx="6" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <rect id="slz-2" class="sl-zone" x="28" y="50" width="64" height="36" rx="8" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <rect id="slz-3" class="sl-zone" x="32" y="84" width="56" height="30" rx="8" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <rect id="slz-4" class="sl-zone" x="6" y="52" width="18" height="52" rx="8" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <rect id="slz-4b" class="sl-zone" x="96" y="52" width="18" height="52" rx="8" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <rect id="slz-5" class="sl-zone" x="34" y="112" width="22" height="56" rx="8" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <rect id="slz-5b" class="sl-zone" x="64" y="112" width="22" height="56" rx="8" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <ellipse id="slz-6" class="sl-zone" cx="45" cy="172" rx="12" ry="6" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+          <ellipse id="slz-6b" class="sl-zone" cx="75" cy="172" rx="12" ry="6" fill="rgba(160,130,220,0.18)" stroke="rgba(160,130,220,0.4)" stroke-width="1.5"/>
+        </svg>
+        <div class="sl-instruction" id="sl-instruction">Notice any tension in your head and face. Breathe in deeply… then let it all go.</div>
+      </div>
+    </div>
+    <div id="sl-done" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:56px;animation:floatY 5s ease-in-out infinite;">🌌</div>
+        <div class="g-title" style="color:#c4b0f0;">Your body<br>is at peace.</div>
+        <div class="g-sub" style="color:rgba(180,160,220,0.5);">Every zone released. You are ready for rest. Let your eyes close.</div>
+        <button class="g-btn" style="border:1.5px solid rgba(160,130,220,0.4);color:#c4b0f0;" onclick="sleepStart()">Scan Again</button>
+        <button class="g-btn-ghost" onclick="showSleepScreen('sl-home')">Back</button>
+      </div>
+    </div>
+  </div>
+  <!-- FOCUS -->
+  <div id="g-focus" class="game-screen" style="background:#080a04;">
+    <div id="fo-home" class="game-screen active" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:48px;animation:floatY 3s ease-in-out infinite;">🎯</div>
+        <div class="g-title" style="color:#f5c842;font-family:'Cormorant Garamond',serif;">Focus</div>
+        <div class="g-sub" style="color:rgba(240,180,60,0.55);">Four 5-minute focus sessions with mindful breathing breaks. Set your intention to begin.</div>
+        <input id="fo-intent-input" type="text" placeholder="What are you focusing on?" maxlength="50" autocomplete="off" oninput="document.getElementById('fo-start-btn').disabled=this.value.trim().length<2"/>
+        <button class="g-btn" id="fo-start-btn" style="border:1.5px solid rgba(240,180,60,0.5);color:#f5c842;" onclick="focusStart()" disabled>Begin Session</button>
+      </div>
+    </div>
+    <div id="fo-focus" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div style="display:flex;justify-content:center;" id="fo-dots"></div>
+        <div style="position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center;">
+          <svg id="fo-svg" viewBox="0 0 180 180" style="position:absolute;inset:0;width:180px;height:180px;transform:rotate(-90deg);">
+            <circle id="fo-track" cx="90" cy="90" r="80" fill="none" stroke="rgba(240,180,60,0.12)" stroke-width="8"/>
+            <circle id="fo-arc" cx="90" cy="90" r="80" fill="none" stroke="#f5c842" stroke-width="8" stroke-linecap="round" stroke-dasharray="502" stroke-dashoffset="502"/>
+          </svg>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-style:italic;color:#f5c842;" id="fo-time">5:00</div>
+            <div style="font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(240,180,60,0.5);margin-top:2px;" id="fo-phase-lbl">Focus</div>
+          </div>
+        </div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(240,180,60,0.45);max-width:260px;line-height:1.5;" id="fo-intent-display"></div>
+        <button class="g-btn-ghost" id="fo-pause-btn" onclick="focusPause()">Pause</button>
+      </div>
+    </div>
+    <div id="fo-break" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:36px;animation:floatY 2s ease-in-out infinite;">🌬️</div>
+        <div class="g-label" style="color:#f5c842;">Break Time</div>
+        <div class="g-sub" style="color:rgba(240,180,60,0.55);" id="fo-break-msg">Session complete. Breathe out, stretch. Let your mind rest.</div>
+        <button class="g-btn" style="border:1.5px solid rgba(240,180,60,0.5);color:#f5c842;" id="fo-next-btn" onclick="focusNextSession()">Next Session →</button>
+      </div>
+    </div>
+    <div id="fo-done" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:52px;animation:floatY 3s ease-in-out infinite;">🏆</div>
+        <div class="g-title" style="color:#f5c842;">Deep work<br>complete.</div>
+        <div class="g-sub" style="color:rgba(240,180,60,0.5);">Four sessions of pure focus. Whatever you worked on today — it mattered.</div>
+        <div class="g-stats"><div class="g-stat"><div class="g-stat-val" style="color:#f5c842;">4</div><div class="g-stat-lbl">Sessions</div></div><div class="g-stat"><div class="g-stat-val" style="color:#f5c842;">20</div><div class="g-stat-lbl">Minutes</div></div></div>
+        <button class="g-btn" style="border:1.5px solid rgba(240,180,60,0.5);color:#f5c842;" onclick="showFocusScreen('fo-home')">New Session</button>
+      </div>
+    </div>
+  </div>
+  <!-- COLOUR BREATH -->
+  <div id="g-colour" class="game-screen" style="background:#080810;">
+    <div id="cb-home" class="game-screen active" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:48px;animation:floatY 3s ease-in-out infinite;">🌈</div>
+        <div class="g-title" style="color:#e8a0e8;font-family:'Cormorant Garamond',serif;">Colour<br>Breath</div>
+        <div class="g-sub" style="color:rgba(220,160,220,0.55);">Choose a colour that calls to you. Inhale it. Exhale its opposite. Let colour shift your state.</div>
+        <div id="cb-chips" style="display:flex;gap:9px;flex-wrap:wrap;justify-content:center;"></div>
+        <button class="g-btn" id="cb-start-btn" style="border:1.5px solid rgba(200,100,200,0.4);color:#e8a0e8;" onclick="colourStart()" disabled>Breathe</button>
+      </div>
+    </div>
+    <div id="cb-breathe" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div class="g-label" id="cb-phase-lbl" style="color:#e8a0e8;">Inhale</div>
+        <div id="cb-orb" style="width:150px;height:150px;border-radius:50%;transition:all 1s ease;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:rgba(255,255,255,0.7);"></div>
+        <div class="g-sub" id="cb-phrase" style="font-size:15px;"></div>
+        <div style="width:180px;height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;"><div id="cb-bar" style="height:100%;width:0%;border-radius:2px;transition:width 0.1s linear;"></div></div>
+        <div class="g-stats"><div class="g-stat"><div class="g-stat-val" id="cb-round" style="color:#e8a0e8;">1</div><div class="g-stat-lbl">Round</div></div><div class="g-stat"><div class="g-stat-val" id="cb-total" style="color:#e8a0e8;">5</div><div class="g-stat-lbl">Total</div></div></div>
+      </div>
+    </div>
+    <div id="cb-done" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:56px;animation:floatY 3s ease-in-out infinite;">🌅</div>
+        <div class="g-title" style="color:#e8a0e8;">Colour<br>shifted.</div>
+        <div class="g-sub" id="cb-done-msg" style="color:rgba(220,160,220,0.55);">Five full cycles complete. Notice how you feel now.</div>
+        <button class="g-btn" style="border:1.5px solid rgba(200,100,200,0.4);color:#e8a0e8;" onclick="showColourScreen('cb-home')">Choose Another</button>
+      </div>
+    </div>
+  </div>
+  <!-- FLOW STATE -->
+  <div id="g-flow" class="game-screen" style="background:#030d0d;">
+    <canvas id="flow-canvas" style="position:absolute;inset:0;"></canvas>
+    <div id="fl-home" class="game-screen active" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:48px;animation:floatY 2s ease-in-out infinite;">💧</div>
+        <div class="g-title" style="color:#80e0e0;font-family:'Cormorant Garamond',serif;">Flow State</div>
+        <div class="g-sub" style="color:rgba(100,200,200,0.55);">Ripples appear and expand. Tap them before they fade. Build your streak. Enter the flow.</div>
+        <button class="g-btn" style="border:1.5px solid rgba(60,200,200,0.5);color:#80e0e0;" onclick="flowStart()">Enter Flow</button>
+      </div>
+    </div>
+    <div id="fl-play" class="game-screen" style="background:transparent;padding:0;">
+      <div style="position:absolute;top:62px;left:50%;transform:translateX(-50%);text-align:center;z-index:10;pointer-events:none;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:42px;font-style:italic;color:#80e0e0;" id="fl-score">0</div>
+        <div style="font-size:10px;color:rgba(120,210,210,0.35);letter-spacing:0.2em;text-transform:uppercase;">Flow</div>
+      </div>
+      <div id="fl-combo" style="position:absolute;top:114px;left:50%;transform:translateX(-50%);font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:rgba(128,224,224,0.45);letter-spacing:0.15em;z-index:10;pointer-events:none;"></div>
+    </div>
+    <div id="fl-done" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:52px;animation:floatY 3s ease-in-out infinite;">🌊</div>
+        <div class="g-title" style="color:#80e0e0;">Flow<br>complete.</div>
+        <div class="g-sub" style="color:rgba(100,200,200,0.5);">The water always returns to stillness. So do you.</div>
+        <div class="g-stats"><div class="g-stat"><div class="g-stat-val" id="fl-final-combo" style="color:#80e0e0;">0</div><div class="g-stat-lbl">Best Streak</div></div></div>
+        <button class="g-btn" style="border:1.5px solid rgba(60,200,200,0.5);color:#80e0e0;" onclick="flowStart()">Flow Again</button>
+        <button class="g-btn-ghost" onclick="showFlowScreen('fl-home')">Back</button>
+      </div>
+    </div>
+  </div>
+  <!-- WEATHER MIND -->
+  <div id="g-weather" class="game-screen" style="background:#060c14;">
+    <canvas id="weather-canvas" style="position:absolute;inset:0;pointer-events:none;"></canvas>
+    <div id="wm-home" class="game-screen active" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:48px;animation:floatY 4s ease-in-out infinite;">🌦️</div>
+        <div class="g-title" style="color:#b0d4f0;font-family:'Cormorant Garamond',serif;">Weather<br>Mind</div>
+        <div class="g-sub" style="color:rgba(160,200,230,0.55);">Name the weather inside you right now. Then breathe as it slowly shifts — from storm to stillness.</div>
+        <button class="g-btn" style="border:1.5px solid rgba(140,190,230,0.5);color:#b0d4f0;" onclick="weatherStart()">Check the Sky</button>
+      </div>
+    </div>
+    <div id="wm-pick" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div class="g-label" style="color:#8ac4e8;">What is the weather inside you right now?</div>
+        <div id="wm-weather-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:340px;"></div>
+      </div>
+    </div>
+    <div id="wm-watch" class="game-screen" style="background:transparent;padding:0;">
+      <div style="position:absolute;top:62px;left:50%;transform:translateX(-50%);text-align:center;z-index:10;pointer-events:none;">
+        <div style="font-size:11px;color:rgba(160,200,230,0.4);letter-spacing:0.3em;text-transform:uppercase;font-family:'Cormorant Garamond',serif;" id="wm-from-lbl"></div>
+        <div style="font-size:32px;margin:8px 0;" id="wm-icon-lbl"></div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:rgba(160,200,230,0.55);max-width:240px;line-height:1.6;" id="wm-breath-phrase">Breathe with the sky…</div>
+      </div>
+      <div style="position:absolute;bottom:32px;left:0;right:0;text-align:center;z-index:10;pointer-events:none;">
+        <div style="width:180px;height:3px;background:rgba(140,190,230,0.1);border-radius:2px;overflow:hidden;margin:0 auto 14px;">
+          <div id="wm-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#8ac4e8,#b0d4f0);border-radius:2px;transition:width 0.3s linear;"></div>
+        </div>
+        <div style="font-size:11px;color:rgba(160,200,230,0.3);letter-spacing:0.25em;text-transform:uppercase;font-family:'Cormorant Garamond',serif;" id="wm-to-lbl">clearing…</div>
+      </div>
+    </div>
+    <div id="wm-done" class="game-screen" style="background:transparent;">
+      <div class="game-inner">
+        <div style="font-size:56px;animation:floatY 4s ease-in-out infinite;" id="wm-done-icon">☀️</div>
+        <div class="g-title" style="color:#b0d4f0;" id="wm-done-title">The sky has cleared.</div>
+        <div class="g-sub" style="color:rgba(160,200,230,0.55);" id="wm-done-msg">Whatever passed through you — it passed. You are the sky, not the weather.</div>
+        <div class="g-stats">
+          <div class="g-stat"><div class="g-stat-val" id="wm-final-breaths" style="color:#b0d4f0;">0</div><div class="g-stat-lbl">Breaths</div></div>
+          <div class="g-stat"><div class="g-stat-val" id="wm-final-time" style="color:#b0d4f0;">0</div><div class="g-stat-lbl">Seconds</div></div>
+        </div>
+        <button class="g-btn" style="border:1.5px solid rgba(140,190,230,0.5);color:#b0d4f0;" onclick="weatherStart()">Check Again</button>
+        <button class="g-btn-ghost" onclick="showWeatherScreen('wm-home')">Back</button>
+      </div>
+    </div>
+  </div>
 
 </div><!-- end game-wrapper -->
 </div><!-- end root -->
-
 <script>
-
 // ══════════════════════════════════════════════════
-// AUDIO ENGINE — shared across all 5 games
+// AUDIO ENGINE
 // ══════════════════════════════════════════════════
-let _ac = null;
-let soundOn = true;
-const _activeNodes = [];
+let _ac=null,soundOn=true;
+const _activeNodes=[];
+function getAC(){if(!_ac)_ac=new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();return _ac;}
+function toggleSound(){soundOn=!soundOn;document.getElementById('snd-btn').textContent=soundOn?'🔔':'🔕';if(!soundOn){_activeNodes.forEach(n=>{try{n.stop();}catch(e){}});_activeNodes.length=0;stopWatersDrone();}}
+function playTone(freq,dur,vol,type,delay){if(!soundOn)return;try{const ac=getAC(),t=ac.currentTime+(delay||0),osc=ac.createOscillator(),gain=ac.createGain();osc.connect(gain);gain.connect(ac.destination);osc.type=type||'sine';osc.frequency.setValueAtTime(freq,t);gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(vol||0.12,t+0.03);gain.gain.exponentialRampToValueAtTime(0.0001,t+dur);osc.start(t);osc.stop(t+dur+0.05);_activeNodes.push(osc);osc.onended=()=>{const i=_activeNodes.indexOf(osc);if(i>-1)_activeNodes.splice(i,1);};}catch(e){}}
+function playChord(freqs,dur,vol,type,delay){freqs.forEach((f,i)=>playTone(f,dur,(vol||0.09)/(i+1)*1.2,type||'sine',(delay||0)+i*0.02));}
+function playCrackle(vol){if(!soundOn)return;try{const ac=getAC(),bufSize=ac.sampleRate*0.08,buf=ac.createBuffer(1,bufSize,ac.sampleRate),data=buf.getChannelData(0);for(let i=0;i<bufSize;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/bufSize,2);const src=ac.createBufferSource(),gain=ac.createGain(),filter=ac.createBiquadFilter();filter.type='bandpass';filter.frequency.value=800+Math.random()*400;filter.Q.value=1;src.buffer=buf;src.connect(filter);filter.connect(gain);gain.connect(ac.destination);gain.gain.setValueAtTime(vol||0.18,ac.currentTime);src.start();src.stop(ac.currentTime+0.12);}catch(e){}}
+function playDrop(pitch){if(!soundOn)return;try{const ac=getAC(),t=ac.currentTime,osc=ac.createOscillator(),gain=ac.createGain();osc.connect(gain);gain.connect(ac.destination);osc.type='sine';osc.frequency.setValueAtTime((pitch||660)*1.2,t);osc.frequency.exponentialRampToValueAtTime((pitch||660)*0.5,t+0.18);gain.gain.setValueAtTime(0.18,t);gain.gain.exponentialRampToValueAtTime(0.0001,t+0.22);osc.start(t);osc.stop(t+0.25);}catch(e){}}
+let _watersDrone=null;
+function startWatersDrone(freq){stopWatersDrone();if(!soundOn)return;try{const ac=getAC();_watersDrone=[];[1,1.5,2,2.667].forEach((m,i)=>{const osc=ac.createOscillator(),gain=ac.createGain();osc.connect(gain);gain.connect(ac.destination);osc.type='sine';osc.frequency.value=freq*m*0.5;gain.gain.setValueAtTime(0,ac.currentTime);gain.gain.linearRampToValueAtTime(0.02/(i+1),ac.currentTime+2.5);osc.start();_watersDrone.push({osc,gain});_activeNodes.push(osc);});}catch(e){}}
+function stopWatersDrone(){if(!_watersDrone)return;try{const ac=getAC();_watersDrone.forEach(({osc,gain})=>{gain.gain.linearRampToValueAtTime(0.0001,ac.currentTime+1);osc.stop(ac.currentTime+1.1);});}catch(e){}  _watersDrone=null;}
+const W_FREQS=[174,285,396];
+function wSoundPhase(phase,lvl){const b=W_FREQS[lvl]||174;if(phase==='inhale')playChord([b*1.5,b*2,b*2.5],1.4,0.09);else if(phase==='hold')playTone(b*2,0.7,0.06);else playChord([b,b*1.5],2,0.08);}
+function wSoundRipple(lvl){playTone(W_FREQS[lvl]*2.5,0.5,0.06);}
+function wSoundComplete(){[0,0.3,0.6,1].forEach((d,i)=>playTone(396*(1+i*0.25),1.5,0.1,'sine',d));}
+function eSoundBurn(){playCrackle(0.2);playTone(120+Math.random()*60,0.15,0.05,'sawtooth');}
+function eSoundAsh(){playChord([220,277,330],2.5,0.08);}
+function eSoundComplete(){playChord([264,330,396,528],3,0.09);}
+const R_NOTES=[523,587,659,698,784];
+function rSoundTap(step){playTone(R_NOTES[step%5],0.6,0.12);}
+function rSoundComplete(){[0,0.2,0.4,0.7,1.1].forEach((d,i)=>playTone(R_NOTES[i],1,0.11,'sine',d));}
+const D_PITCHES=[440,494,523,587,659];let _dDropIdx=0;
+function dSoundCatch(){playDrop(D_PITCHES[_dDropIdx++%5]);}
+function dSoundComplete(){playChord([294,370,440],2,0.1);}
+const C_NOTES=[261,294,330,349,392,440,494];let _cStarIdx=0;
+function cSoundStar(){playTone(C_NOTES[_cStarIdx++%7],0.9,0.13);}
+function cSoundLine(a,b){playChord([C_NOTES[a%7],C_NOTES[b%7]],1.2,0.1);}
+function cSoundComplete(){C_NOTES.forEach((f,i)=>playTone(f,2,0.08,'sine',i*0.12));}
+function slSoundRelease(){playChord([196,220,261],2,0.09);}
+function slSoundComplete(){[0,0.3,0.6,1,1.4,1.8,2.2].forEach((d,i)=>playTone([196,220,261,294,330,349,392][i],2,0.08,'sine',d));}
+function foSoundTick(){}
+function foSoundBreak(){playChord([330,415,494],1.5,0.1);}
+function foSoundComplete(){[0,0.2,0.5,0.9].forEach((d,i)=>playTone([396,440,528,660][i],2,0.11,'sine',d));}
+function cbSoundPhase(colour,isInhale){const f=isInhale?440:330;playTone(f,0.3,0.1);}
+function cbSoundComplete(){playChord([261,330,392,523],2.5,0.1);}
+function flSoundHit(combo){const f=261+combo*22;playTone(Math.min(f,880),0.25,0.13);}
+function flSoundMiss(){playTone(180,0.25,0.08,'sine');}
+function flSoundComplete(){playChord([440,550,660],2,0.1);}
 
-function getAC(){
-  if(!_ac) _ac = new (window.AudioContext||window.webkitAudioContext)();
-  if(_ac.state==='suspended') _ac.resume();
-  return _ac;
-}
-function toggleSound(){
-  soundOn = !soundOn;
-  document.getElementById('snd-btn').textContent = soundOn ? '🔔' : '🔕';
-  if(!soundOn){ _activeNodes.forEach(n=>{try{n.stop();}catch(e){}});  _activeNodes.length=0; stopWatersDrone(); }
-}
 
-// Core: play a sine/triangle tone with attack+release envelope
-function playTone(freq, dur, vol, type, delay){
-  if(!soundOn) return null;
-  try{
-    const ac=getAC(), t=ac.currentTime+(delay||0);
-    const osc=ac.createOscillator(), gain=ac.createGain();
-    osc.connect(gain); gain.connect(ac.destination);
-    osc.type = type||'sine';
-    osc.frequency.setValueAtTime(freq, t);
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(vol||0.15, t+0.03);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t+dur);
-    osc.start(t); osc.stop(t+dur+0.05);
-    _activeNodes.push(osc);
-    osc.onended = ()=>{ const i=_activeNodes.indexOf(osc); if(i>-1)_activeNodes.splice(i,1); };
-    return osc;
-  }catch(e){ return null; }
-}
-
-// Layered chord
-function playChord(freqs, dur, vol, type, delay){
-  freqs.forEach((f,i)=>playTone(f, dur, (vol||0.1)/(i+1)*1.2, type||'sine', (delay||0)+i*0.02));
-}
-
-// Noise burst (fire crackle)
-function playCrackle(vol){
-  if(!soundOn) return;
-  try{
-    const ac=getAC(), bufSize=ac.sampleRate*0.08;
-    const buf=ac.createBuffer(1,bufSize,ac.sampleRate);
-    const data=buf.getChannelData(0);
-    for(let i=0;i<bufSize;i++) data[i]=(Math.random()*2-1)*Math.pow(1-i/bufSize,2);
-    const src=ac.createBufferSource(), gain=ac.createGain();
-    const filter=ac.createBiquadFilter();
-    filter.type='bandpass'; filter.frequency.value=800+Math.random()*400; filter.Q.value=1;
-    src.buffer=buf; src.connect(filter); filter.connect(gain); gain.connect(ac.destination);
-    gain.gain.setValueAtTime(vol||0.18,ac.currentTime);
-    src.start(); src.stop(ac.currentTime+0.12);
-  }catch(e){}
-}
-
-// Soft water drop (Drift)
-function playDrop(pitch){
-  if(!soundOn) return;
-  try{
-    const ac=getAC(), t=ac.currentTime;
-    const osc=ac.createOscillator(), gain=ac.createGain();
-    osc.connect(gain); gain.connect(ac.destination);
-    osc.type='sine';
-    osc.frequency.setValueAtTime((pitch||660)*1.2, t);
-    osc.frequency.exponentialRampToValueAtTime((pitch||660)*0.5, t+0.18);
-    gain.gain.setValueAtTime(0.18, t);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t+0.22);
-    osc.start(t); osc.stop(t+0.25);
-  }catch(e){}
-}
-
-// Continuous drone (Waters ambient pad)
-let _watersDrone = null;
-function startWatersDrone(freq){
-  stopWatersDrone();
-  if(!soundOn) return;
-  try{
-    const ac=getAC();
-    _watersDrone=[];
-    [1, 1.5, 2, 2.667].forEach((m,i)=>{
-      const osc=ac.createOscillator(), gain=ac.createGain();
-      osc.connect(gain); gain.connect(ac.destination);
-      osc.type='sine'; osc.frequency.value=freq*m*0.5;
-      gain.gain.setValueAtTime(0, ac.currentTime);
-      gain.gain.linearRampToValueAtTime(0.022/(i+1), ac.currentTime+2.5);
-      osc.start(); _watersDrone.push({osc,gain});
-      _activeNodes.push(osc);
+// ── PER-CARD MINI ANIMATIONS ──
+const CARD_EFFECTS = {
+  waters:        (ctx, w, h, t) => {
+    for (let i = 1; i <= 3; i++) {
+      const r = (((t * 22 * i) % (w * 0.8)) + w * 0.1);
+      const a = Math.max(0, 1 - r / (w * 0.75)) * 0.35;
+      ctx.beginPath(); ctx.arc(w * 0.15, h * 0.5, Math.max(0,r), 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(127,219,202,${a})`; ctx.lineWidth = 1; ctx.stroke();
+    }
+  },
+  ember: (ctx, w, h, t) => {
+    // pre-seeded embers so they don't regenerate each frame
+    if (!ctx._ep) {
+      ctx._ep = Array.from({length:14}, () => ({
+        x: Math.random() * w, y: h + Math.random() * h * 0.5,
+        vx: (Math.random()-.5)*.6, vy: -(0.4+Math.random()*0.9),
+        r: 0.8+Math.random()*1.5, life: Math.random(),
+        hue: 10+Math.random()*35, fl: Math.random()*Math.PI*2
+      }));
+    }
+    ctx._ep.forEach(p => {
+      p.x += p.vx + Math.sin(t+p.fl)*.2; p.y += p.vy; p.life += .003; p.fl += .07;
+      if (p.y < -5) { p.y = h+5; p.x = Math.random()*w; p.life=0; }
+      const a = Math.min(p.life, 1-Math.max(0,p.life-.8)*5) * .7;
+      ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0,p.r), 0, Math.PI*2);
+      ctx.fillStyle = `hsla(${p.hue},100%,65%,${a})`; ctx.fill();
     });
-  }catch(e){}
-}
-function stopWatersDrone(){
-  if(!_watersDrone) return;
-  try{
-    const ac=getAC();
-    _watersDrone.forEach(({osc,gain})=>{
-      gain.gain.linearRampToValueAtTime(0.0001, ac.currentTime+1.2);
-      osc.stop(ac.currentTime+1.3);
+  },
+  root: (ctx, w, h, t) => {
+    // swaying grass blades
+    for (let i = 0; i < 9; i++) {
+      const bx = (i / 8) * w * 0.9 + w * 0.05;
+      const sway = Math.sin(t * 0.9 + i * 0.7) * 5;
+      const bh = h * (0.35 + (i % 3) * 0.08);
+      ctx.beginPath();
+      ctx.moveTo(bx, h);
+      ctx.quadraticCurveTo(bx + sway, h - bh * 0.55, bx + sway * 1.8, h - bh);
+      ctx.strokeStyle = `rgba(134,197,107,${0.25 + (i%3)*0.07})`; ctx.lineWidth = 1.2; ctx.stroke();
+    }
+  },
+  drift: (ctx, w, h, t) => {
+    if (!ctx._lp) {
+      ctx._lp = Array.from({length:8}, ()=>({
+        x:Math.random()*w, y:Math.random()*h,
+        vx:(Math.random()-.5)*.4, vy:.3+Math.random()*.5,
+        rot:Math.random()*Math.PI*2, rotV:(Math.random()-.5)*.03,
+        sz:5+Math.random()*5,
+        col:['#a8d885','#86c56b','#c8e6a0'][Math.floor(Math.random()*3)]
+      }));
+    }
+    ctx._lp.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.rotV;
+      if (p.y > h+10) { p.y=-10; p.x=Math.random()*w; }
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.beginPath();
+      ctx.moveTo(0,-p.sz*.5);
+      ctx.bezierCurveTo(p.sz*.4,-p.sz*.25,p.sz*.35,p.sz*.35,0,p.sz*.5);
+      ctx.bezierCurveTo(-p.sz*.35,p.sz*.35,-p.sz*.4,-p.sz*.25,0,-p.sz*.5);
+      ctx.fillStyle=p.col+'88'; ctx.fill(); ctx.restore();
     });
-  }catch(e){}
-  _watersDrone=null;
+  },
+  constellation: (ctx, w, h, t) => {
+    if (!ctx._cs) {
+      ctx._cs = Array.from({length:7}, ()=>({
+        x:8+Math.random()*(w-16), y:5+Math.random()*(h-10),
+        r:0.8+Math.random(), ph:Math.random()*Math.PI*2, sp:.5+Math.random()*.5
+      }));
+    }
+    // lines
+    ctx._cs.forEach((s,i) => {
+      if(i===0) return;
+      const prev = ctx._cs[i-1];
+      ctx.beginPath(); ctx.moveTo(prev.x,prev.y); ctx.lineTo(s.x,s.y);
+      ctx.strokeStyle=`rgba(253,230,138,0.12)`; ctx.lineWidth=.6; ctx.stroke();
+    });
+    ctx._cs.forEach(s => {
+      const a = .25 + .4*Math.abs(Math.sin(t*s.sp+s.ph));
+      ctx.beginPath(); ctx.arc(s.x, s.y, Math.max(0,s.r*1.5), 0, Math.PI*2);
+      ctx.fillStyle=`rgba(253,230,138,${a})`; ctx.fill();
+    });
+    // shooting star across card
+    const stx = ((t*25)%(w+60))-20;
+    const sty = h*.25 + Math.sin(t*.5)*h*.1;
+    ctx.beginPath(); ctx.moveTo(stx,sty); ctx.lineTo(stx-25,sty-8);
+    ctx.strokeStyle='rgba(253,240,180,0.4)'; ctx.lineWidth=1.2; ctx.stroke();
+  },
+  sleep: (ctx, w, h, t) => {
+    for (let b = 0; b < 3; b++) {
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 4) {
+        const y = h*(0.3+b*.2) + Math.sin(x*.018+t*(0.25+b*.1)+b)*8;
+        x===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=`rgba(180,150,230,${0.12-b*.03})`; ctx.lineWidth=1.5; ctx.stroke();
+    }
+    // moon
+    const mx=w*.82, my=h*.22;
+    ctx.beginPath(); ctx.arc(mx,my,7,0,Math.PI*2);
+    ctx.fillStyle='rgba(200,180,255,0.2)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(mx+3,my,6,0,Math.PI*2);
+    ctx.fillStyle='rgba(6,4,15,0.9)'; ctx.fill();
+  },
+  focus: (ctx, w, h, t) => {
+    const cx=w*.5, cy=h*.5;
+    [28,18,9].forEach((r,i) => {
+      const off = 502*(1-(((t*8*(i+1))%80)/80));
+      ctx.beginPath(); ctx.arc(cx, cy, Math.max(0,r), -(Math.PI/2), Math.PI*2-(Math.PI/2));
+      ctx.strokeStyle=`rgba(245,200,66,${0.3-i*.08})`; ctx.lineWidth=1.5;
+      ctx.setLineDash([off,502-off]); ctx.stroke(); ctx.setLineDash([]);
+    });
+  },
+  colour: (ctx, w, h, t) => {
+    for (let i=0;i<4;i++) {
+      const hue=(t*20+i*90)%360;
+      const x=w*(0.2+i*.2), y=h*.5+Math.sin(t*.6+i)*h*.15;
+      const grad=ctx.createRadialGradient(x, y, 0, x, y, 30);
+      grad.addColorStop(0,`hsla(${hue},70%,65%,0.12)`);
+      grad.addColorStop(1,`hsla(${hue},70%,65%,0)`);
+      ctx.beginPath(); ctx.arc(x,y,30,0,Math.PI*2);
+      ctx.fillStyle=grad; ctx.fill();
+    }
+  },
+  flow: (ctx, w, h, t) => {
+    if (!ctx._fd) {
+      ctx._fd = Array.from({length:4},(_,i)=>({
+        x:w*(0.2+i*.2), y:h*.5+((i%2)-.5)*h*.25, born:Date.now()-i*700,
+        maxR:22+i*8, speed:0.35+i*.08
+      }));
+    }
+    const now=Date.now();
+    ctx._fd.forEach(p => {
+      const age=(now-p.born)/1000;
+      if(age<0) return;
+      const r=Math.min(Math.max(0,age*p.speed*60),p.maxR);
+      const a=(1-r/Math.max(1,p.maxR))*.5;
+      if(a<.02){p.born=now+Math.random()*500;return;}
+      ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(0,r), 0, Math.PI*2);
+      ctx.strokeStyle=`rgba(80,220,220,${a})`; ctx.lineWidth=1; ctx.stroke();
+    });
+  },
+  weather: (ctx, w, h, t) => {
+    // slow drifting clouds + rain streaks
+    if (!ctx._wc) {
+      ctx._wc = Array.from({length:3}, (_,i) => ({
+        x: w*(0.1+i*0.35), y: h*(0.2+i*0.15),
+        vx: 0.15+i*0.08, r: 18+i*6, phase: i*1.1
+      }));
+    }
+    ctx._wc.forEach(c => {
+      c.x += c.vx; if(c.x > w+30) c.x = -30;
+      const a = 0.08 + 0.04*Math.sin(t*0.4+c.phase);
+      ctx.beginPath();
+      ctx.ellipse(c.x, c.y, c.r, c.r*0.55, 0, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(160,200,240,${a})`; ctx.fill();
+    });
+    // rain streaks
+    for(let i=0;i<6;i++){
+      const rx = ((t*38+i*w/6)%w);
+      const ry = ((t*80+i*h/3)%h);
+      ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx-1, ry+6);
+      ctx.strokeStyle=`rgba(140,190,230,0.18)`; ctx.lineWidth=0.8; ctx.stroke();
+    }
+  }
+};
+
+// Card RAF handles
+const cardRAFs = {};
+function startCardEffects() {
+  Object.entries(CARD_EFFECTS).forEach(([name, draw]) => {
+    const cv = document.getElementById('gcc-'+name);
+    if (!cv) return;
+    const card = cv.parentElement;
+    const rect = card.getBoundingClientRect();
+    cv.width = rect.width || 360; cv.height = rect.height || 62;
+    const ctx = cv.getContext('2d');
+    cancelAnimationFrame(cardRAFs[name]);
+    function loop() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      draw(ctx, cv.width, cv.height, performance.now() * 0.001);
+      cardRAFs[name] = requestAnimationFrame(loop);
+    }
+    loop();
+  });
 }
 
-// ── STILL WATERS sounds ──
-const W_FREQS=[174,285,396]; // Solfeggio per level
-function wSoundPhase(phase, lvl){
-  const base=W_FREQS[lvl]||174;
-  if(phase==='inhale')  playChord([base*1.5, base*2, base*2.5], 1.4, 0.1);
-  else if(phase==='hold') playTone(base*2, 0.7, 0.07, 'sine');
-  else                    playChord([base, base*1.5], 2.0, 0.09);
-}
-function wSoundRipple(lvl){
-  playTone(W_FREQS[lvl]*2.5, 0.5, 0.07, 'sine');
-}
-function wSoundComplete(){
-  const f=396;
-  [0,0.3,0.6,1.0].forEach((d,i)=>playTone(f*(1+i*0.25), 1.5, 0.12, 'sine', d));
+function stopCardEffects() {
+  Object.keys(cardRAFs).forEach(k => cancelAnimationFrame(cardRAFs[k]));
 }
 
-// ── EMBER MIND sounds ──
-function eSoundBurn(){ playCrackle(0.22); playTone(120+Math.random()*60, 0.15, 0.06, 'sawtooth'); }
-function eSoundAsh(){ playChord([220,277,330], 2.5, 0.08); }
-function eSoundComplete(){ playChord([264,330,396,528], 3, 0.1); }
+// Start on load
+window.addEventListener('load', () => {
+  setTimeout(startCardEffects, 200);
+});
+window.addEventListener('resize', () => {
+  startCardEffects();
+  if(wmRunning && wmCv){wmCv.width=window.innerWidth;wmCv.height=window.innerHeight;}
+});
 
-// ── ROOT sounds ──
-const R_NOTES=[523,587,659,698,784]; // C5 D5 E5 F5 G5
-function rSoundTap(step){ playTone(R_NOTES[step%R_NOTES.length], 0.6, 0.13, 'sine'); }
-function rSoundAffirmation(step){ playChord([R_NOTES[step%R_NOTES.length], R_NOTES[step%R_NOTES.length]*1.25], 1.2, 0.1); }
-function rSoundComplete(){ [0,0.2,0.4,0.7,1.1].forEach((d,i)=>playTone(R_NOTES[i], 1.0, 0.12, 'sine', d)); }
-
-// ── DRIFT sounds ──
-const D_PITCHES=[440,494,523,587,659];
-let _driftDropIdx=0;
-function dSoundCatch(){ playDrop(D_PITCHES[_driftDropIdx%D_PITCHES.length]); _driftDropIdx++; }
-function dSoundComplete(){ playChord([294,370,440], 2, 0.1); }
-
-// ── CONSTELLATION sounds ──
-const C_STAR_NOTES=[261,294,330,349,392,440,494]; // C4 major scale
-let _cStarIdx=0;
-function cSoundStar(){ playTone(C_STAR_NOTES[_cStarIdx%C_STAR_NOTES.length], 0.9, 0.14, 'sine'); _cStarIdx++; }
-function cSoundLine(a,b){ 
-  const fa=C_STAR_NOTES[a%C_STAR_NOTES.length], fb=C_STAR_NOTES[b%C_STAR_NOTES.length];
-  playChord([fa,fb], 1.2, 0.1);
-}
-function cSoundComplete(){ 
-  C_STAR_NOTES.forEach((f,i)=>playTone(f, 2, 0.09, 'sine', i*0.12));
-}
-
-
-// ══════════════════════════════════════════════════
-// BG STARS
-// ══════════════════════════════════════════════════
-const bgCanvas = document.getElementById('bg-canvas');
-const bgCtx = bgCanvas.getContext('2d');
-let bgStars = [];
-function initBgStars(){
-  bgCanvas.width = window.innerWidth;
-  bgCanvas.height = window.innerHeight;
-  bgStars = Array.from({length:80},()=>({
-    x:Math.random()*bgCanvas.width, y:Math.random()*bgCanvas.height,
-    r:0.4+Math.random()*1.2, phase:Math.random()*Math.PI*2, speed:0.5+Math.random()*1
+// ── BACKGROUND: calm starfield + slow aurora ribbons ──
+const bgCanvas=document.getElementById('bg-canvas'),bgCtx=bgCanvas.getContext('2d');
+let bgStars=[],bgShoot=[];
+function initBg(){
+  bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;
+  bgStars=Array.from({length:90},()=>({
+    x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,
+    r:0.3+Math.random()*1.1,phase:Math.random()*Math.PI*2,speed:0.3+Math.random()*0.6
+  }));
+  bgShoot=Array.from({length:3},(_,i)=>({
+    x:Math.random()*bgCanvas.width*0.7,y:Math.random()*bgCanvas.height*0.45,
+    vx:4+Math.random()*4,vy:1.5+Math.random()*2,
+    tail:[],alpha:0,waitUntil:Date.now()+i*3500+Math.random()*4000
   }));
 }
-function drawBgStars(){
-  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-  const t = Date.now()*0.001;
+function drawBg(){
+  const W=bgCanvas.width,H=bgCanvas.height,t=Date.now()*0.001,now=Date.now();
+  bgCtx.clearRect(0,0,W,H);
+  // aurora bands — very subtle
+  for(let b=0;b<3;b++){
+    const baseY=H*(0.18+b*0.14);
+    const hue=240+b*30+Math.sin(t*0.15+b)*15;
+    bgCtx.beginPath();bgCtx.moveTo(0,baseY);
+    for(let x=0;x<=W;x+=10){
+      const y=baseY+Math.sin(x*0.005+t*0.2+b)*14+Math.sin(x*0.011+t*0.3+b*2)*6;
+      bgCtx.lineTo(x,y);
+    }
+    bgCtx.lineTo(W,0);bgCtx.lineTo(0,0);bgCtx.closePath();
+    const ag=bgCtx.createLinearGradient(0,baseY-30,0,baseY+30);
+    ag.addColorStop(0,`hsla(${hue},55%,55%,0)`);
+    ag.addColorStop(0.5,`hsla(${hue},55%,55%,0.028)`);
+    ag.addColorStop(1,`hsla(${hue},55%,55%,0)`);
+    bgCtx.fillStyle=ag;bgCtx.fill();
+  }
+  // stars
   bgStars.forEach(s=>{
-    const a = 0.1+0.25*Math.sin(t*s.speed+s.phase);
-    bgCtx.beginPath(); bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    bgCtx.fillStyle=`rgba(200,210,240,${a})`; bgCtx.fill();
+    const a=0.08+0.18*Math.abs(Math.sin(t*s.speed+s.phase));
+    bgCtx.beginPath();bgCtx.arc(s.x,s.y,Math.max(0,s.r),0,Math.PI*2);
+    bgCtx.fillStyle=`rgba(210,220,245,${a})`;bgCtx.fill();
   });
-  requestAnimationFrame(drawBgStars);
+  // occasional shooting stars
+  bgShoot.forEach(s=>{
+    if(now<s.waitUntil)return;
+    s.x+=s.vx;s.y+=s.vy;s.alpha=Math.min(s.alpha+0.06,1);
+    s.tail.push({x:s.x,y:s.y});if(s.tail.length>18)s.tail.shift();
+    s.tail.forEach((pt,i)=>{
+      const a=(i/s.tail.length)*s.alpha*0.55;
+      bgCtx.beginPath();bgCtx.arc(pt.x,pt.y,Math.max(0,(i/s.tail.length)*1.8),0,Math.PI*2);
+      bgCtx.fillStyle=`rgba(240,235,210,${a})`;bgCtx.fill();
+    });
+    if(s.x>W+80||s.y>H+80){
+      s.x=Math.random()*W*0.6;s.y=Math.random()*H*0.35;
+      s.vx=4+Math.random()*4;s.vy=1.5+Math.random()*2;
+      s.tail=[];s.alpha=0;s.waitUntil=now+3000+Math.random()*6000;
+    }
+  });
+  requestAnimationFrame(drawBg);
 }
-initBgStars(); drawBgStars();
-window.addEventListener('resize',initBgStars);
+initBg();drawBg();
+window.addEventListener('resize',initBg);
 
 // ══════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════
-let currentGame = null;
+let currentGame=null;
 function launchGame(name){
+  stopCardEffects();
   document.getElementById('hub').classList.add('hidden');
-  const wrapper = document.getElementById('game-wrapper');
-  wrapper.classList.add('active');
-  ['waters','ember','root','drift','constellation'].forEach(g=>{
-    document.getElementById('g-'+g).classList.remove('active');
-  });
+  document.getElementById('game-wrapper').classList.add('active');
+  ['waters','ember','root','drift','constellation','sleep','focus','colour','flow','weather'].forEach(g=>document.getElementById('g-'+g).classList.remove('active'));
   document.getElementById('g-'+name).classList.add('active');
-  currentGame = name;
+  currentGame=name;
 }
 function returnToHub(){
   stopAllGames();
   document.getElementById('game-wrapper').classList.remove('active');
   document.getElementById('hub').classList.remove('hidden');
-  currentGame = null;
+  currentGame=null;
+  setTimeout(startCardEffects, 80);
 }
 function stopAllGames(){
-  watersStop(); emberStop(); driftStop();
-  // Stop constellation loop and clear handler
-  cancelAnimationFrame(cRaf); cRunning=false;
-  if(cCanvas) cCanvas.onclick=null;
+  watersStop();emberStop();driftStop();focusStop();colourStop();flowStop();weatherStop();
+  cancelAnimationFrame(cRaf);cRunning=false;stopWatersDrone();
 }
 function haptic(p){if(navigator.vibrate)navigator.vibrate(p||15);}
-function burstEmbers(x,y,n){
-  for(let i=0;i<(n||14);i++){
-    const e=document.createElement('div');
-    const ang=Math.random()*Math.PI*2, dist=50+Math.random()*100;
-    const tx=Math.cos(ang)*dist, ty=Math.sin(ang)*dist-60;
-    const sz=2+Math.random()*4, dur=0.5+Math.random()*0.9;
-    const hue=15+Math.random()*30;
-    e.style.cssText=`position:fixed;left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;margin:-${sz/2}px;border-radius:50%;background:hsl(${hue},100%,60%);box-shadow:0 0 ${sz*2}px hsl(${hue},100%,70%);pointer-events:none;z-index:999;--tx:${tx}px;--ty:${ty}px;--dur:${dur}s;animation:emberFloat ${dur}s ease-out forwards;`;
-    document.body.appendChild(e);
-    setTimeout(()=>e.remove(),dur*1000+100);
-  }
-}
+function burstEmbers(x,y,n){for(let i=0;i<(n||12);i++){const e=document.createElement('div'),ang=Math.random()*Math.PI*2,dist=40+Math.random()*90,tx=Math.cos(ang)*dist,ty=Math.sin(ang)*dist-50,sz=2+Math.random()*3,dur=0.5+Math.random()*0.8,hue=15+Math.random()*30;e.style.cssText=`position:fixed;left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;margin:-${sz/2}px;border-radius:50%;background:hsl(${hue},100%,60%);pointer-events:none;z-index:999;--tx:${tx}px;--ty:${ty}px;animation:emberFloat ${dur}s ease-out forwards;`;document.body.appendChild(e);setTimeout(()=>e.remove(),dur*1000+100);}}
 
 // ══════════════════════════════════════════════════
 // GAME 1: STILL WATERS
@@ -728,73 +902,52 @@ const W_LEVELS=[
   {name:'Flowing',color:'#89b4fa',light:'#b9d4ff',bg:'#0d1117',iDur:5000,hDur:2000,eDur:5000},
   {name:'Transcending',color:'#f5a97f',light:'#ffd0b0',bg:'#150d0a',iDur:6000,hDur:2400,eDur:6000},
 ];
-const W_MANTRAS=['You are present.','Breathe in peace.','Let go of tension.','You are enough.','This moment is whole.','Peace flows through you.','You are the observer.','Stillness is your nature.'];
-let wLvl=0,wBreaths=0,wScore=0,wPhase='inhale',wRunning=false,wTimer=null,wRAF=null,wPhaseStart=0,wPhaseDur=0;
-
-function showWatersScreen(id){
-  document.querySelectorAll('#g-waters .game-screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+const W_MANTRAS=['You are present.','Breathe in peace.','Let go of tension.','You are enough.','This moment is whole.','Peace flows through you.','Stillness is your nature.'];
+let wLvl=0,wBreaths=0,wTotalBreaths=0,wRunning=false,wTimer=null,wRAF=null,wPhaseStart=0,wPhaseDur=0,wPhase='inhale';
+function showWatersScreen(id){document.querySelectorAll('#g-waters .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function watersStart(){
-  wLvl=0;wBreaths=0;wScore=0;wRunning=true;
+  wLvl=0;wBreaths=0;wTotalBreaths=0;wRunning=true;
   document.getElementById('w-stat-b').textContent='0';
-  document.getElementById('w-stat-s').textContent='0';
   document.getElementById('w-mantra').textContent=`"${W_MANTRAS[0]}"`;
-  buildWDots(); applyWLevel(); showWatersScreen('ws-breathe');
+  buildWDots();applyWLevel();showWatersScreen('ws-breathe');
   setTimeout(()=>wStartPhase('inhale'),500);
 }
 function watersStop(){wRunning=false;clearTimeout(wTimer);cancelAnimationFrame(wRAF);stopWatersDrone();}
-function buildWDots(){
-  const c=document.getElementById('w-dots'); c.innerHTML='';
-  W_LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='w-dot';d.id='wd-'+i;c.appendChild(d);});
-}
+function buildWDots(){const c=document.getElementById('w-dots');c.innerHTML='';W_LEVELS.forEach((_,i)=>{const d=document.createElement('div');d.className='w-dot';d.id='wd-'+i;d.style.cssText='height:3px;border-radius:2px;background:rgba(255,255,255,0.15);transition:all 0.6s;display:inline-block;width:14px;';c.appendChild(d);});}
 function applyWLevel(){
   const lv=W_LEVELS[wLvl];
   document.getElementById('g-waters').style.background=lv.bg;
   document.getElementById('w-level-lbl').textContent=`Level ${wLvl+1} — ${lv.name}`;
   document.getElementById('w-level-lbl').style.color=lv.color;
-  W_LEVELS.forEach((_,i)=>{
-    const d=document.getElementById('wd-'+i);
-    if(!d)return;
-    d.style.background=i<=wLvl?W_LEVELS[i].color:'rgba(255,255,255,0.15)';
-    d.style.width=i===wLvl?'30px':'14px';
-  });
+  W_LEVELS.forEach((_,i)=>{const d=document.getElementById('wd-'+i);if(!d)return;d.style.background=i<=wLvl?W_LEVELS[i].color:'rgba(255,255,255,0.15)';d.style.width=i===wLvl?'30px':'14px';});
   const orb=document.getElementById('w-orb');
   orb.style.background=`radial-gradient(circle at 38% 32%,${lv.light},${lv.color} 55%,${lv.bg})`;
   ['wr1','wr2','wr3'].forEach(id=>document.getElementById(id).style.borderColor=lv.color);
   document.getElementById('w-progress').style.background=lv.color;
   document.getElementById('w-breath-lbl').style.color=lv.light;
   document.getElementById('w-stat-b').style.color=lv.light;
-  document.getElementById('w-stat-s').style.color=lv.light;
-  if(wRunning) startWatersDrone(W_FREQS[wLvl]);
+  
+  if(wRunning)startWatersDrone(W_FREQS[wLvl]);
 }
 function wStartPhase(phase){
   if(!wRunning)return;
-  wPhase=phase; const lv=W_LEVELS[wLvl];
+  wPhase=phase;const lv=W_LEVELS[wLvl];
   const durs={inhale:lv.iDur,hold:lv.hDur,exhale:lv.eDur};
-  wPhaseDur=durs[phase]; wPhaseStart=performance.now();
-  const labels={inhale:'Breathe In',hold:'Hold',exhale:'Breathe Out'};
-  const colors={inhale:lv.light,hold:'#fff',exhale:lv.color};
-  const icons={inhale:'↑',hold:'·',exhale:'↓'};
-  document.getElementById('w-breath-lbl').textContent=labels[phase];
-  document.getElementById('w-breath-lbl').style.color=colors[phase];
-  document.getElementById('w-orb').textContent=icons[phase];
+  wPhaseDur=durs[phase];wPhaseStart=performance.now();
+  document.getElementById('w-breath-lbl').textContent={inhale:'Breathe In',hold:'Hold',exhale:'Breathe Out'}[phase];
+  document.getElementById('w-breath-lbl').style.color={inhale:lv.light,hold:'#fff',exhale:lv.color}[phase];
+  document.getElementById('w-orb').textContent={inhale:'↑',hold:'·',exhale:'↓'}[phase];
   haptic(phase==='inhale'?[25]:phase==='hold'?[10,20,10]:[45]);
-  wSoundPhase(phase, wLvl);
+  wSoundPhase(phase,wLvl);
   cancelAnimationFrame(wRAF);
   function tick(now){
     if(!wRunning)return;
     const p=Math.min((now-wPhaseStart)/wPhaseDur,1);
     document.getElementById('w-progress').style.width=(p*100)+'%';
-    let sc=phase==='inhale'?0.72+p*0.53:phase==='hold'?1.25:1.25-p*0.53;
+    const sc=phase==='inhale'?0.72+p*0.53:phase==='hold'?1.25:1.25-p*0.53;
     const orb=document.getElementById('w-orb');
     orb.style.transform=`scale(${sc})`;
-    orb.style.boxShadow=`0 0 ${40+sc*28}px ${Math.round(sc*14)}px ${lv.color}${Math.round((0.18+sc*0.2)*255).toString(16).padStart(2,'0')}`;
-    ['wr1','wr2','wr3'].forEach((id,n)=>{
-      const r=document.getElementById(id);
-      const base=[0.3,0.18,0.12][n];
-      r.style.opacity=phase==='hold'?base*2:base;
-    });
+    orb.style.boxShadow=`0 0 ${40+sc*28}px ${Math.round(sc*12)}px ${lv.color}44`;
     if(p<1)wRAF=requestAnimationFrame(tick);
   }
   wRAF=requestAnimationFrame(tick);
@@ -804,32 +957,25 @@ function wStartPhase(phase){
     if(phase==='inhale')wStartPhase('hold');
     else if(phase==='hold')wStartPhase('exhale');
     else{
-      wBreaths++;wScore+=10;
-      document.getElementById('w-stat-b').textContent=wBreaths;
-      document.getElementById('w-stat-s').textContent=wScore;
+      wBreaths++;wTotalBreaths++;
+      document.getElementById('w-stat-b').textContent=wTotalBreaths;
+      
       if(wBreaths%3===0)document.getElementById('w-mantra').textContent=`"${W_MANTRAS[Math.floor(Math.random()*W_MANTRAS.length)]}"`;
-      if(wBreaths>=7){
-        wBreaths=0;
-        if(wLvl<W_LEVELS.length-1){wLvl++;applyWLevel();}
-        else{wRunning=false;stopWatersDrone();wSoundComplete();document.getElementById('w-final-s').textContent=wScore;document.getElementById('w-final-b').textContent=21;showWatersScreen('ws-done');return;}
+      if(wBreaths>=7){wBreaths=0;
+        if(wLvl<2){wLvl++;applyWLevel();}
+        else{wRunning=false;stopWatersDrone();wSoundComplete();document.getElementById('w-final-b').textContent=wTotalBreaths;showWatersScreen('ws-done');return;}
       }
       wStartPhase('inhale');
     }
   },wPhaseDur);
 }
-// Ripple on touch — only when actively breathing
 document.getElementById('ws-breathe').addEventListener('pointerdown',function(e){
   if(!wRunning)return;
   const r=this.getBoundingClientRect();
-  const rip=document.createElement('div');
-  rip.className='ripple-dot';
-  rip.style.left=((e.clientX-r.left)/r.width*100)+'%';
-  rip.style.top=((e.clientY-r.top)/r.height*100)+'%';
-  rip.style.borderColor=W_LEVELS[wLvl].color;
-  this.appendChild(rip);
-  setTimeout(()=>rip.remove(),1300);
-  wScore+=2;document.getElementById('w-stat-s').textContent=wScore;
-  wSoundRipple(wLvl); haptic(8);
+  const rip=document.createElement('div');rip.className='ripple-dot';
+  rip.style.left=((e.clientX-r.left)/r.width*100)+'%';rip.style.top=((e.clientY-r.top)/r.height*100)+'%';
+  rip.style.borderColor=W_LEVELS[wLvl].color;this.appendChild(rip);setTimeout(()=>rip.remove(),1300);
+  wSoundRipple(wLvl);haptic(8);
 });
 
 // ══════════════════════════════════════════════════
@@ -837,313 +983,180 @@ document.getElementById('ws-breathe').addEventListener('pointerdown',function(e)
 // ══════════════════════════════════════════════════
 const E_PROMPTS=['What thought weighs on you?','What are you resisting?','What fear keeps returning?','What do you wish to release?','What judgment are you holding?'];
 const E_MANTRAS=[['I release what I cannot control.','Peace lives beneath the thinking.'],['I am not my thoughts.','This feeling will pass.'],['What I resist persists. What I release transforms.','I choose stillness.'],['Fear is just love seeking direction.','I am safe right now.'],['Judgment dissolves in awareness.','I see clearly now.']];
-let eRound=0,eScore=0,eReleased=0,eBurnInt=null,eThought='';
-
-function showEmberScreen(id){
-  document.querySelectorAll('#g-ember .game-screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-function emberStop(){clearInterval(eBurnInt); eBurnInt=null;}
-function emberStart(){
-  eRound=0;eScore=0;eReleased=0;eThought='';
-  setupEmberRound(); showEmberScreen('es-write');
-}
+let eRound=0,eReleased=0,eBurnInt=null,eThought='';
+function showEmberScreen(id){document.querySelectorAll('#g-ember .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function emberStop(){clearInterval(eBurnInt);eBurnInt=null;}
+function emberStart(){eRound=0;eReleased=0;eThought='';setupEmberRound();showEmberScreen('es-write');}
 function setupEmberRound(){
-  document.getElementById('e-input').value='';
-  document.getElementById('e-charfill').style.width='0%';
-  document.getElementById('e-burnbtn').disabled=true;
-  document.getElementById('e-round-lbl').textContent=`Release ${eRound+1} of 5`;
-  document.getElementById('e-score-lbl').textContent=`✦ ${eScore}`;
-  document.getElementById('e-prompt').textContent=E_PROMPTS[eRound%E_PROMPTS.length];
+  document.getElementById('e-input').value='';document.getElementById('e-charfill').style.width='0%';
+  document.getElementById('e-burnbtn').disabled=true;document.getElementById('e-round-lbl').textContent=`Release ${eRound+1} of 5`;
+  document.getElementById('e-prompt').textContent=E_PROMPTS[eRound%5];
 }
-function eOnType(){
-  const v=document.getElementById('e-input').value.trim();
-  document.getElementById('e-charfill').style.width=Math.min(v.length/80*100,100)+'%';
-  document.getElementById('e-burnbtn').disabled=v.length<3;
-}
+function eOnType(){const v=document.getElementById('e-input').value.trim();document.getElementById('e-charfill').style.width=Math.min(v.length/80*100,100)+'%';document.getElementById('e-burnbtn').disabled=v.length<3;}
 function emberBurn(){
-  eThought=document.getElementById('e-input').value.trim();
-  if(!eThought)return;
-  haptic([25,40,80]);
-  showEmberScreen('es-burning');
+  eThought=document.getElementById('e-input').value.trim();if(!eThought)return;
+  haptic([25,40,80]);showEmberScreen('es-burning');
   const disp=document.getElementById('e-burning-text');
-  disp.innerHTML=eThought.split('').map((c,i)=>`<span class="e-char" id="ec-${i}">${c===' '?'&nbsp;':c}</span>`).join('');
-  // Delay burst so element is rendered and has size
-  setTimeout(()=>{const rect=disp.getBoundingClientRect();burstEmbers(rect.left+rect.width/2,rect.top+rect.height/2,20);},80);
+  disp.innerHTML=eThought.split('').map((c,i)=>`<span class="e-char">${c===' '?'&nbsp;':c}</span>`).join('');
+  setTimeout(()=>{const rect=disp.getBoundingClientRect();burstEmbers(rect.left+rect.width/2,rect.top+rect.height/2,18);},80);
   const chars=disp.querySelectorAll('.e-char');
-  let i=0; const delay=Math.max(40,2800/Math.max(chars.length,1));
+  let i=0;const delay=Math.max(40,2800/Math.max(chars.length,1));
   eBurnInt=setInterval(()=>{
-    if(i<chars.length){
-      chars[i].classList.add('burned');
-      if(Math.random()>0.6){const cr=chars[i].getBoundingClientRect();burstEmbers(cr.left,cr.top,2);}
-      if(Math.random()>0.5) eSoundBurn(); haptic(4); i++;
-    } else {
-      clearInterval(eBurnInt); eBurnInt=null;
-      setTimeout(()=>chars.forEach(c=>{c.classList.remove('burned');c.classList.add('ash');}),200);
-      setTimeout(()=>showEmberAsh(),900);
-    }
+    if(i<chars.length){chars[i].classList.add('burned');if(Math.random()>0.55){const cr=chars[i].getBoundingClientRect();burstEmbers(cr.left,cr.top,2);}if(Math.random()>0.5)eSoundBurn();haptic(4);i++;}
+    else{clearInterval(eBurnInt);eBurnInt=null;setTimeout(()=>chars.forEach(c=>{c.classList.remove('burned');c.classList.add('ash');}),200);setTimeout(()=>showEmberAsh(),900);}
   },delay);
 }
 function showEmberAsh(){
-  eReleased++;eScore+=20+Math.min(eThought.length,80);
-  const mp=E_MANTRAS[Math.floor(Math.random()*E_MANTRAS.length)];
+  eReleased++;
+  const mp=E_MANTRAS[Math.floor(Math.random()*5)];
   document.getElementById('e-ash-orig').textContent=eThought;
-  document.getElementById('e-mantra-text').textContent=mp[Math.floor(Math.random()*mp.length)];
-  document.getElementById('e-ash-count').textContent=eReleased;
+  document.getElementById('e-mantra-text').textContent=mp[Math.floor(Math.random()*2)];
   document.getElementById('e-next-btn').textContent=eRound>=4?'Complete the Ritual ✦':'Write Another →';
-  eSoundAsh(); haptic([35,50,35]); showEmberScreen('es-ash');
+  eSoundAsh();haptic([35,50,35]);showEmberScreen('es-ash');
 }
-function emberNext(){
-  eRound++;
-  if(eRound>=5){ emberDone(); }
-  else{ showEmberScreen('es-write'); setupEmberRound(); }
-}
-function emberSkip(){
-  eRound++;
-  if(eRound>=5){ emberDone(); }
-  else{ showEmberScreen('es-write'); setupEmberRound(); }
-}
-function emberDone(){
-  document.getElementById('e-final-r').textContent=eReleased;
-  document.getElementById('e-final-s').textContent=eScore;
-  eSoundComplete(); haptic([40,60,40,60,100]); showEmberScreen('es-done');
-}
+function emberNext(){eRound++;if(eRound>=5)emberDone();else{showEmberScreen('es-write');setupEmberRound();}}
+function emberSkip(){eRound++;if(eRound>=5)emberDone();else{showEmberScreen('es-write');setupEmberRound();}}
+function emberDone(){document.getElementById('e-final-r').textContent=eReleased;eSoundComplete();haptic([40,60,40,60,100]);showEmberScreen('es-done');}
 
 // ══════════════════════════════════════════════════
-// GAME 3: ROOT (5-4-3-2-1 GROUNDING)
+// GAME 3: ROOT
 // ══════════════════════════════════════════════════
 const ROOT_STEPS=[
-  {num:5,sense:'See',icon:'👁️',instruction:'Notice 5 things you can SEE right now.',items:['A colour','A shape','A texture','A shadow','Something moving'],affirmation:'Your eyes are open. You are here.'},
-  {num:4,sense:'Touch',icon:'🤲',instruction:'Notice 4 things you can FEEL right now.',items:['Your feet on the floor','Air on your skin','Your breath','Your heartbeat'],affirmation:'Your body is real. You are grounded.'},
-  {num:3,sense:'Hear',icon:'👂',instruction:'Notice 3 things you can HEAR right now.',items:['A distant sound','A nearby sound','The silence beneath sound'],affirmation:'The world speaks to you. You are present.'},
-  {num:2,sense:'Smell',icon:'👃',instruction:'Notice 2 things you can SMELL right now.',items:['The air around you','A subtle scent nearby'],affirmation:'You are breathing. You are alive.'},
-  {num:1,sense:'Taste',icon:'👅',instruction:'Notice 1 thing you can TASTE right now.',items:['What lingers in your mouth'],affirmation:'You are fully here. Anchored. Whole.'},
+  {sense:'See',icon:'👁️',instruction:'Notice 5 things you can SEE right now.',items:['A colour','A shape','A texture','A shadow','Something moving'],affirmation:'Your eyes are open. You are here.'},
+  {sense:'Touch',icon:'🤲',instruction:'Notice 4 things you can FEEL right now.',items:['Your feet on the floor','Air on your skin','Your breath','Your heartbeat'],affirmation:'Your body is real. You are grounded.'},
+  {sense:'Hear',icon:'👂',instruction:'Notice 3 things you can HEAR right now.',items:['A distant sound','A nearby sound','The silence beneath sound'],affirmation:'The world speaks to you. You are present.'},
+  {sense:'Smell',icon:'👃',instruction:'Notice 2 things you can SMELL right now.',items:['The air around you','A subtle scent nearby'],affirmation:'You are breathing. You are alive.'},
+  {sense:'Taste',icon:'👅',instruction:'Notice 1 thing you can TASTE right now.',items:['What lingers in your mouth'],affirmation:'You are fully here. Anchored. Whole.'},
 ];
-let rStep=0,rDone=[],rScore=0,rAdvancing=false;
-
-function showRootScreen(id){
-  document.querySelectorAll('#g-root .game-screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-function rootStart(){
-  rStep=0;rDone=[];rScore=0;rAdvancing=false;
-  buildRPips(); loadRootStep(); showRootScreen('rs-sense');
-}
-function buildRPips(){
-  const c=document.getElementById('r-pips'); c.innerHTML='';
-  ROOT_STEPS.forEach((_,i)=>{const p=document.createElement('div');p.className='r-pip';p.id='rp-'+i;c.appendChild(p);});
-}
+let rStep=0,rDone=[],rAdvancing=false;
+function showRootScreen(id){document.querySelectorAll('#g-root .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function rootStart(){rStep=0;rDone=[];rAdvancing=false;buildRPips();loadRootStep();showRootScreen('rs-sense');}
+function buildRPips(){const c=document.getElementById('r-pips');c.innerHTML='';ROOT_STEPS.forEach((_,i)=>{const p=document.createElement('div');p.className='r-pip';p.id='rp-'+i;c.appendChild(p);});}
 function loadRootStep(){
-  const s=ROOT_STEPS[rStep];
+  const s=ROOT_STEPS[rStep];rDone=[];
   document.getElementById('r-step-lbl').textContent=`Step ${rStep+1} of 5 · ${s.sense}`;
   document.getElementById('r-instruction').textContent=s.instruction;
   document.getElementById('r-affirmation').classList.add('hidden');
-  rDone=[];
-  const grid=document.getElementById('r-grid'); grid.innerHTML='';
+  const grid=document.getElementById('r-grid');grid.innerHTML='';
   s.items.forEach((item,i)=>{
     const isCenter=s.items.length===1;
-    const card=document.createElement('div');
-    card.className=isCenter?'r-center-card':'r-sense-card';
+    const card=document.createElement('div');card.className=isCenter?'r-center-card':'r-sense-card';
     card.innerHTML=`<div class="r-sense-icon">${s.icon}</div><div class="r-sense-name">${item}</div>`;
-    card.onclick=()=>rTap(card,i,s);
-    if(isCenter)grid.appendChild(card);
-    else grid.appendChild(card);
+    card.onclick=()=>rTap(card,i,s);grid.appendChild(card);
   });
 }
 function rTap(card,i,s){
   if(rDone.includes(i)||rAdvancing)return;
-  rDone.push(i); card.classList.add('done');
-  rSoundTap(rStep);
-  const rip=document.createElement('div');rip.className='r-ripple';card.appendChild(rip);
-  setTimeout(()=>rip.remove(),500);
-  rScore+=15; haptic([20,10,20]);
+  rDone.push(i);card.classList.add('done');
+  const rip=document.createElement('div');rip.className='r-ripple';card.appendChild(rip);setTimeout(()=>rip.remove(),500);
+  rSoundTap(rStep);haptic([20,10,20]);
   if(rDone.length>=s.items.length){
     rAdvancing=true;
     setTimeout(()=>{
-      const aff=document.getElementById('r-affirmation');
-      aff.textContent=s.affirmation; aff.classList.remove('hidden'); rSoundAffirmation(rStep);
+      const aff=document.getElementById('r-affirmation');aff.textContent=s.affirmation;aff.classList.remove('hidden');
       document.getElementById('rp-'+rStep).classList.add('done');
-      setTimeout(()=>{
-        rStep++;
-        rAdvancing=false;
-        if(rStep>=ROOT_STEPS.length)rootDone();
-        else loadRootStep();
-      },2000);
+      setTimeout(()=>{rStep++;rAdvancing=false;if(rStep>=5)rootDone();else loadRootStep();},2000);
     },400);
   }
 }
-function rootDone(){
-  document.getElementById('r-final-sc').textContent=rScore;
-  rSoundComplete(); haptic([40,60,40,60,100]); showRootScreen('rs-done');
-}
+function rootDone(){rSoundComplete();haptic([40,60,40,60,100]);showRootScreen('rs-done');}
 
 // ══════════════════════════════════════════════════
 // GAME 4: DRIFT
 // ══════════════════════════════════════════════════
-const D_THOUGHTS=['worry','doubt','regret','fear','anger','stress','anxiety','sadness','confusion','judgment','envy','shame','guilt','longing','grief'];
+const D_THOUGHTS=['worry','doubt','regret','fear','anger','stress','anxiety','sadness','confusion','judgment','envy','shame','guilt','longing'];
 const D_LEAVES=['🍂','🍁','🌿','🍃','🌾'];
-let dScore=0,dMissed=0,dTimer=60,dRunning=false,dTimerInt=null,dLeafInt=null,dLeaves=[];
-
-function showDriftScreen(id){
-  document.querySelectorAll('#g-drift .game-screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+let dScore=0,dMissed=0,dTimer=60,dRunning=false,dTimerInt=null,dLeafInt=null,dBodyLeaves=[];
+function showDriftScreen(id){document.querySelectorAll('#g-drift .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 function driftStop(){
   dRunning=false;clearInterval(dTimerInt);clearInterval(dLeafInt);
   document.getElementById('d-leaf-wrap').innerHTML='';
-  // Clean up any caught leaves still floating on body
   document.querySelectorAll('.d-leaf').forEach(l=>l.remove());
-  dLeaves=[];
+  dBodyLeaves.forEach(l=>{if(l.parentNode)l.remove();});dBodyLeaves=[];
 }
 function driftStart(){
-  driftStop();
-  dScore=0;dMissed=0;dTimer=60;dRunning=true;dLeaves=[];
-  document.getElementById('d-score').textContent='0';
-  document.getElementById('d-timer').textContent='60';
-  document.getElementById('d-leaf-wrap').innerHTML='';
+  driftStop();dScore=0;dMissed=0;dTimer=60;dRunning=true;
+  document.getElementById('d-score').textContent='0';document.getElementById('d-timer').textContent='60';
   showDriftScreen('ds-play');
-
-  // Draw river on canvas
   const canvas=document.getElementById('drift-canvas');
-  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
   const ctx=canvas.getContext('2d');
   function drawRiver(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    const t=Date.now()*0.001;
-    // River waves
-    ctx.strokeStyle='rgba(100,160,220,0.08)';ctx.lineWidth=1.5;
-    for(let w=0;w<5;w++){
-      ctx.beginPath();
-      for(let x=0;x<=canvas.width;x+=8){
-        const y=canvas.height-30-w*14+Math.sin(x*0.02+t+w)*6;
-        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-      }
-      ctx.stroke();
-    }
+    ctx.clearRect(0,0,canvas.width,canvas.height);const t=Date.now()*0.001;
+    ctx.strokeStyle='rgba(100,160,220,0.07)';ctx.lineWidth=1.5;
+    for(let w=0;w<5;w++){ctx.beginPath();for(let x=0;x<=canvas.width;x+=8){const y=canvas.height-30-w*14+Math.sin(x*0.02+t+w)*6;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.stroke();}
     if(dRunning)requestAnimationFrame(drawRiver);
   }
   drawRiver();
-
-  // Spawn leaves
-  dLeafInt=setInterval(spawnLeaf,1800);
-  spawnLeaf();
-
-  // Countdown
-  dTimerInt=setInterval(()=>{
-    dTimer--;
-    document.getElementById('d-timer').textContent=dTimer;
-    if(dTimer<=0){driftStop();driftDone();}
-  },1000);
+  dLeafInt=setInterval(spawnLeaf,1800);spawnLeaf();
+  dTimerInt=setInterval(()=>{dTimer--;document.getElementById('d-timer').textContent=dTimer;if(dTimer<=0){driftStop();driftDone();}},1000);
 }
 function spawnLeaf(){
   if(!dRunning)return;
-  const wrap=document.getElementById('d-leaf-wrap');
-  const leaf=document.createElement('div');
+  const wrap=document.getElementById('d-leaf-wrap'),leaf=document.createElement('div');
   leaf.className='d-leaf';
   const thought=D_THOUGHTS[Math.floor(Math.random()*D_THOUGHTS.length)];
-  const leafEmoji=D_LEAVES[Math.floor(Math.random()*D_LEAVES.length)];
-  const x=10+Math.random()*80;
-  const lx=(Math.random()-0.5)*20;
-  const dur=6+Math.random()*5;
-  const delay=0;
-  const r0=(Math.random()-0.5)*30;
-  const r1=(Math.random()-0.5)*60;
-  leaf.style.cssText=`left:${x}%;top:-60px;--dur:${dur}s;--delay:${delay}s;--lx:${lx}vw;--ly:0px;--r0:${r0}deg;--r1:${r1}deg;`;
-  leaf.innerHTML=`<div style="text-align:center;">${leafEmoji}<div style="font-size:10px;color:rgba(168,200,240,0.6);font-family:'Cormorant Garamond',serif;font-style:italic;margin-top:2px;">${thought}</div></div>`;
-  leaf.onclick=()=>catchLeaf(leaf,thought);
+  const x=8+Math.random()*82,lx=(Math.random()-0.5)*18,dur=6+Math.random()*5;
+  const r0=(Math.random()-0.5)*30,r1=(Math.random()-0.5)*60;
+  leaf.style.cssText=`left:${x}%;top:-60px;--dur:${dur}s;--lx:${lx}vw;--ly:0px;--r0:${r0}deg;--r1:${r1}deg;`;
+  leaf.innerHTML=`<div style="text-align:center;">${D_LEAVES[Math.floor(Math.random()*5)]}<div style="font-size:9px;color:rgba(168,200,240,0.55);font-family:'Cormorant Garamond',serif;font-style:italic;margin-top:1px;">${thought}</div></div>`;
+  leaf.onclick=(e)=>{e.stopPropagation();catchLeaf(leaf,thought);};
   wrap.appendChild(leaf);
-  const id={el:leaf,thought};
-  dLeaves.push(id);
-  setTimeout(()=>{
-    if(leaf.parentNode){leaf.remove();dMissed++;const idx=dLeaves.indexOf(id);if(idx>-1)dLeaves.splice(idx,1);}
-  },dur*1000);
+  setTimeout(()=>{if(leaf.parentNode){leaf.remove();dMissed++;}},dur*1000);
 }
 function catchLeaf(leaf,thought){
   if(!dRunning||!leaf.parentNode)return;
-  leaf.onclick=null; // prevent double-tap
-  dSoundCatch(); haptic([15,10,25]);
-  dScore++;
+  leaf.onclick=null;dSoundCatch();haptic([15,10,25]);dScore++;
   document.getElementById('d-score').textContent=dScore;
   const rect=leaf.getBoundingClientRect();
-  leaf.parentNode.removeChild(leaf); // remove from wrap to prevent missed count
-  leaf.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;font-size:28px;pointer-events:none;transition:all 0.8s ease;z-index:50;`;
-  document.body.appendChild(leaf);
-  setTimeout(()=>{
-    leaf.style.top=(window.innerHeight-60)+'px';
-    leaf.style.opacity='0.3';
-    leaf.style.transform='scale(0.6)';
-  },50);
-  setTimeout(()=>{leaf.style.opacity='0';},700);
-  setTimeout(()=>{ if(leaf.parentNode) leaf.remove(); },900);
-  const flash=document.createElement('div');
-  flash.className='d-release-flash';
-  const playEl=document.getElementById('ds-play');
-  if(playEl){ playEl.appendChild(flash); setTimeout(()=>{ if(flash.parentNode) flash.remove(); },500); }
+  leaf.parentNode.removeChild(leaf);
+  leaf.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;font-size:26px;pointer-events:none;transition:all 0.8s ease;z-index:50;`;
+  document.body.appendChild(leaf);dBodyLeaves.push(leaf);
+  setTimeout(()=>{leaf.style.top=(window.innerHeight-50)+'px';leaf.style.opacity='0.2';leaf.style.transform='scale(0.5)';},50);
+  setTimeout(()=>{if(leaf.parentNode)leaf.remove();},900);
 }
-function driftDone(){
-  document.getElementById('d-final-r').textContent=dScore;
-  document.getElementById('d-final-m').textContent=dMissed;
-  dSoundComplete(); haptic([40,60,40]); showDriftScreen('ds-done');
-}
+function driftDone(){document.getElementById('d-final-r').textContent=dScore;document.getElementById('d-final-m').textContent=dMissed;dSoundComplete();haptic([40,60,40]);showDriftScreen('ds-done');}
 
 // ══════════════════════════════════════════════════
-// GAME 5: CONSTELLATION
+// GAME 5: CONSTELLATION (REBUILT — tap on div, not canvas)
 // ══════════════════════════════════════════════════
-let cStars=[],cLines=[],cSelected=null,cLineCount=0,cRunning=false;
-let cCanvas,cCtx,cRaf;
+let cStars=[],cLines=[],cSelected=null,cLineCount=0,cRunning=false,cRaf=null;
+let cCanvas=null,cCtx=null;
 const MAX_STARS=7;
-
 function showConstScreen(id){
   document.querySelectorAll('#g-constellation .game-screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 function constStart(){
   cStars=[];cLines=[];cSelected=null;cLineCount=0;cRunning=true;_cStarIdx=0;
-  cancelAnimationFrame(cRaf); // stop any running loop
-  if(cCanvas) cCanvas.onclick=null; // clear old click handler
+  cancelAnimationFrame(cRaf);
+  document.querySelectorAll('.c-name-tag').forEach(t=>t.remove());
   document.getElementById('c-intention-input').value='';
   document.getElementById('c-add-btn').disabled=true;
   document.getElementById('c-stars-count').textContent='0';
   document.getElementById('c-count-lbl').textContent='Intention 1 of '+MAX_STARS;
-  // Remove ALL stale name tags from any screen
-  document.querySelectorAll('.c-name-tag').forEach(t=>t.remove());
   showConstScreen('cs-plant');
-  initConstCanvas();
-}
-function initConstCanvas(){
   cCanvas=document.getElementById('const-canvas');
-  cCanvas.width=window.innerWidth; cCanvas.height=window.innerHeight;
+  cCanvas.width=window.innerWidth;cCanvas.height=window.innerHeight;
   cCtx=cCanvas.getContext('2d');
-  cancelAnimationFrame(cRaf);
   drawConst();
 }
 function drawConst(){
   if(!cCtx)return;
   cCtx.clearRect(0,0,cCanvas.width,cCanvas.height);
-  // Draw lines
   cLines.forEach(([a,b])=>{
-    const sa=cStars[a],sb=cStars[b];
-    if(!sa||!sb)return;
-    const grad=cCtx.createLinearGradient(sa.x,sa.y,sb.x,sb.y);
-    grad.addColorStop(0,'rgba(253,230,138,0.5)');
-    grad.addColorStop(1,'rgba(253,230,138,0.5)');
+    const sa=cStars[a],sb=cStars[b];if(!sa||!sb)return;
     cCtx.beginPath();cCtx.moveTo(sa.x,sa.y);cCtx.lineTo(sb.x,sb.y);
-    cCtx.strokeStyle=grad;cCtx.lineWidth=1;cCtx.stroke();
+    cCtx.strokeStyle='rgba(253,230,138,0.45)';cCtx.lineWidth=1;cCtx.stroke();
   });
-  // Draw stars
   const t=Date.now()*0.001;
   cStars.forEach((s,i)=>{
     const pulse=1+0.15*Math.sin(t*1.5+i*1.2);
-    // Glow
-    const grd=cCtx.createRadialGradient(s.x,s.y,0,s.x,s.y,14*pulse);
-    grd.addColorStop(0,'rgba(253,230,138,0.35)');
-    grd.addColorStop(1,'rgba(253,230,138,0)');
-    cCtx.beginPath();cCtx.arc(s.x,s.y,14*pulse,0,Math.PI*2);
-    cCtx.fillStyle=grd;cCtx.fill();
-    // Star dot
+    const grd=cCtx.createRadialGradient(s.x, s.y, 0, s.x, s.y, Math.max(0,14*pulse));
+    grd.addColorStop(0,'rgba(253,230,138,0.35)');grd.addColorStop(1,'rgba(253,230,138,0)');
+    cCtx.beginPath();cCtx.arc(s.x, s.y, Math.max(0,14*pulse), 0, Math.PI*2);cCtx.fillStyle=grd;cCtx.fill();
     cCtx.beginPath();cCtx.arc(s.x,s.y,3.5,0,Math.PI*2);
-    cCtx.fillStyle=i===cSelected?'#fff':'rgba(253,230,138,0.9)';
-    cCtx.fill();
+    cCtx.fillStyle=i===cSelected?'#fff':'rgba(253,230,138,0.9)';cCtx.fill();
     if(i===cSelected){cCtx.beginPath();cCtx.arc(s.x,s.y,7,0,Math.PI*2);cCtx.strokeStyle='rgba(253,230,138,0.5)';cCtx.lineWidth=1;cCtx.stroke();}
   });
   cRaf=requestAnimationFrame(drawConst);
@@ -1154,67 +1167,636 @@ document.getElementById('c-intention-input').addEventListener('input',function()
 function constAddStar(){
   const intention=document.getElementById('c-intention-input').value.trim();
   if(!intention||cStars.length>=MAX_STARS)return;
-  const margin=60;
+  const margin=80;
   const x=margin+Math.random()*(window.innerWidth-margin*2);
-  const y=margin+Math.random()*(window.innerHeight*0.65);
+  const y=margin+Math.random()*(window.innerHeight*0.6);
   cStars.push({x,y,name:intention});
-  // Name tag
-  const tag=document.createElement('div');
-  tag.className='c-name-tag';
-  tag.textContent=intention;
-  tag.style.left=x+'px'; tag.style.top=(y+14)+'px';
-  tag.style.transform='translateX(-50%)';
+  const tag=document.createElement('div');tag.className='c-name-tag';
+  tag.textContent=intention;tag.style.left=x+'px';tag.style.top=(y+16)+'px';
   document.getElementById('cs-plant').appendChild(tag);
   document.getElementById('c-stars-count').textContent=cStars.length;
   document.getElementById('c-intention-input').value='';
   document.getElementById('c-add-btn').disabled=true;
-  cSoundStar(); haptic([15,10,20]);
-  const n=cStars.length;
-  if(n>=MAX_STARS){setTimeout(()=>constGoConnect(),600);}
-  else document.getElementById('c-count-lbl').textContent=`Intention ${n+1} of ${MAX_STARS}`;
+  cSoundStar();haptic([15,10,20]);
+  if(cStars.length>=MAX_STARS)setTimeout(()=>constGoConnect(),600);
+  else document.getElementById('c-count-lbl').textContent=`Intention ${cStars.length+1} of ${MAX_STARS}`;
 }
 function constGoConnect(){
+  if(cStars.length<1)return;
   cSelected=null;
-  showConstScreen('cs-connect');
-  // Move name tags
-  document.querySelectorAll('.c-name-tag').forEach(t=>{
-    document.getElementById('cs-connect').appendChild(t);
-  });
-  cCanvas.onclick=constHandleTap;
+  // Move name tags to cs-play div
+  document.querySelectorAll('.c-name-tag').forEach(t=>document.getElementById('cs-play').appendChild(t));
+  showConstScreen('cs-play');
 }
 function constHandleTap(e){
-  const rect=cCanvas.getBoundingClientRect();
-  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  // Stars are placed at window coords, so use clientX/Y directly
+  const mx=e.clientX,my=e.clientY;
   let hit=-1;
-  cStars.forEach((s,i)=>{
-    const d=Math.hypot(s.x-mx,s.y-my);
-    if(d<22)hit=i;
-  });
+  cStars.forEach((s,i)=>{if(Math.hypot(s.x-mx,s.y-my)<24)hit=i;});
   if(hit===-1){cSelected=null;document.getElementById('c-connect-hint').textContent='Tap a star to select it';return;}
   haptic(12);
   if(cSelected===null){
-    cSelected=hit;
-    document.getElementById('c-connect-hint').textContent='Now tap another star to connect';
+    cSelected=hit;document.getElementById('c-connect-hint').textContent='Now tap another star to connect';
   } else {
     if(cSelected!==hit){
       const key=[Math.min(cSelected,hit),Math.max(cSelected,hit)];
-      const exists=cLines.some(([a,b])=>a===key[0]&&b===key[1]);
-      if(!exists){cLines.push(key);cLineCount++;cSoundLine(cSelected,hit);haptic([15,25]);}
+      if(!cLines.some(([a,b])=>a===key[0]&&b===key[1])){cLines.push(key);cLineCount++;cSoundLine(cSelected,hit);haptic([15,25]);}
     }
-    cSelected=null;
-    document.getElementById('c-connect-hint').textContent='Tap a star to select it';
+    cSelected=null;document.getElementById('c-connect-hint').textContent='Tap a star to select it';
   }
 }
 function constComplete(){
-  if(cStars.length===0)return; // nothing to seal
-  cRunning=false; cCanvas.onclick=null; cancelAnimationFrame(cRaf);
+  if(cStars.length===0)return;
+  cRunning=false;cancelAnimationFrame(cRaf);
   document.getElementById('c-final-stars').textContent=cStars.length;
   document.getElementById('c-final-lines').textContent=cLineCount;
-  const intDiv=document.getElementById('c-final-intentions');
-  intDiv.innerHTML=cStars.map(s=>`<span style="padding:4px 10px;background:rgba(253,230,138,0.07);border:1px solid rgba(253,230,138,0.15);border-radius:20px;font-size:11px;color:rgba(253,230,138,0.65);font-family:'Cormorant Garamond',serif;font-style:italic;">${s.name}</span>`).join('');
-  cSoundComplete(); haptic([40,60,40,60,100]);
-  showConstScreen('cs-done');
+  document.getElementById('c-final-intentions').innerHTML=cStars.map(s=>`<span style="padding:3px 9px;background:rgba(253,230,138,0.07);border:1px solid rgba(253,230,138,0.15);border-radius:20px;font-size:11px;color:rgba(253,230,138,0.65);font-family:'Cormorant Garamond',serif;font-style:italic;">${s.name}</span>`).join('');
+  cSoundComplete();haptic([40,60,40,60,100]);showConstScreen('cs-done');
 }
+
+// ══════════════════════════════════════════════════
+// GAME 6: SLEEP WIND-DOWN
+// ══════════════════════════════════════════════════
+const SL_ZONES=[
+  {ids:['slz-0'],label:'Head & Face',instruction:'Notice any tension in your head and face. Breathe in deeply… then let it all go.'},
+  {ids:['slz-1'],label:'Neck & Throat',instruction:'Feel your neck and throat. Any tightness here? Breathe in… and release.'},
+  {ids:['slz-2'],label:'Chest & Heart',instruction:'Place awareness on your chest. Feel it rise and fall. Breathe in love… breathe out tension.'},
+  {ids:['slz-3'],label:'Belly & Core',instruction:'Soften your belly completely. Let it be full and loose. Breathe in… let go.'},
+  {ids:['slz-4','slz-4b'],label:'Arms & Hands',instruction:'Feel the weight of your arms. Let them be heavy. Breathe in… and release.'},
+  {ids:['slz-5','slz-5b'],label:'Legs & Thighs',instruction:'Notice your legs. Let them sink. Breathe in… release completely.'},
+  {ids:['slz-6','slz-6b'],label:'Feet & Toes',instruction:'Your feet. The very ends of you. Breathe in… and let every last bit of tension flow out.'},
+];
+let slStep=0,slRunning=false;
+function showSleepScreen(id){document.querySelectorAll('#g-sleep .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function sleepStart(){
+  slStep=0;slRunning=true;
+  SL_ZONES.forEach(z=>z.ids.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove('released');el.style.fill='rgba(160,130,220,0.22)';el.style.stroke='rgba(160,130,220,0.5)';}}));
+  buildSlPips();loadSlZone();showSleepScreen('sl-scan');
+  // Wire up zone taps
+  SL_ZONES.forEach((z,i)=>z.ids.forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>slTapZone(i);}));
+}
+function buildSlPips(){const c=document.getElementById('sl-pips');c.innerHTML='';SL_ZONES.forEach((_,i)=>{const p=document.createElement('div');p.className='sl-pip';p.id='sp-'+i;c.appendChild(p);});}
+function loadSlZone(){
+  const z=SL_ZONES[slStep];
+  document.getElementById('sl-zone-lbl').textContent=z.label;
+  document.getElementById('sl-instruction').textContent=z.instruction;
+  // Highlight current zone
+  z.ids.forEach(id=>{const el=document.getElementById(id);if(el){el.style.fill='rgba(160,130,220,0.5)';el.style.stroke='rgba(200,180,255,0.9)';}});
+}
+function slTapZone(i){
+  if(i!==slStep||!slRunning)return;
+  const z=SL_ZONES[i];
+  z.ids.forEach(id=>{const el=document.getElementById(id);if(el){el.classList.add('released');el.style.fill='rgba(160,130,220,0.06)';el.style.stroke='rgba(160,130,220,0.15)';}});
+  document.getElementById('sp-'+i).classList.add('done');
+  slSoundRelease();haptic([30,20,30]);
+  slStep++;
+  if(slStep>=SL_ZONES.length){slRunning=false;setTimeout(()=>{slSoundComplete();showSleepScreen('sl-done');},800);}
+  else{setTimeout(()=>loadSlZone(),600);}
+}
+
+// ══════════════════════════════════════════════════
+// GAME 7: FOCUS
+// ══════════════════════════════════════════════════
+const FO_SESSION_DURATION=5*60; // 5 minutes
+let foSession=0,foRunning=false,foPaused=false,foTimeLeft=FO_SESSION_DURATION,foInt=null,foIntent='';
+function showFocusScreen(id){document.querySelectorAll('#g-focus .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function focusStop(){foRunning=false;clearInterval(foInt);}
+function focusStart(){
+  foIntent=document.getElementById('fo-intent-input').value.trim();
+  if(!foIntent)return;
+  foSession=0;foRunning=true;foPaused=false;foTimeLeft=FO_SESSION_DURATION;
+  buildFoDots();showFocusScreen('fo-focus');
+  document.getElementById('fo-intent-display').textContent=foIntent;
+  document.getElementById('fo-pause-btn').textContent='Pause';
+  startFoTimer();
+}
+function buildFoDots(){
+  const c=document.getElementById('fo-dots');c.innerHTML='';
+  for(let i=0;i<4;i++){const d=document.createElement('div');d.className='fo-dot'+(i===0?' active':'');d.id='fod-'+i;c.appendChild(d);}
+}
+function startFoTimer(){
+  clearInterval(foInt);
+  foInt=setInterval(()=>{
+    if(!foRunning||foPaused)return;
+    foTimeLeft--;
+    updateFoDisplay();
+    if(foTimeLeft<=0){clearInterval(foInt);foSessionComplete();}
+  },1000);
+  updateFoDisplay();
+}
+function updateFoDisplay(){
+  const m=Math.floor(foTimeLeft/60),s=foTimeLeft%60;
+  document.getElementById('fo-time').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  const progress=1-(foTimeLeft/FO_SESSION_DURATION);
+  document.getElementById('fo-arc').style.strokeDashoffset=502-(502*progress);
+}
+function focusPause(){
+  foPaused=!foPaused;
+  document.getElementById('fo-pause-btn').textContent=foPaused?'Resume':'Pause';
+}
+function foSessionComplete(){
+  document.getElementById('fod-'+foSession).classList.remove('active');
+  document.getElementById('fod-'+foSession).classList.add('done');
+  foSoundBreak();haptic([40,60,40]);
+  if(foSession>=3){focusAllDone();return;}
+  document.getElementById('fo-break-msg').textContent=`Session ${foSession+1} complete. Breathe out, stretch. Ready when you are.`;
+  showFocusScreen('fo-break');
+}
+function focusNextSession(){
+  foSession++;foTimeLeft=FO_SESSION_DURATION;foRunning=true;foPaused=false;
+  document.getElementById('fo-arc').style.strokeDashoffset=502;
+  document.getElementById('fod-'+foSession).classList.add('active');
+  document.getElementById('fo-pause-btn').textContent='Pause';
+  showFocusScreen('fo-focus');startFoTimer();
+}
+function focusAllDone(){foRunning=false;foSoundComplete();haptic([40,60,40,60,100]);showFocusScreen('fo-done');}
+
+// ══════════════════════════════════════════════════
+// GAME 8: COLOUR BREATH
+// ══════════════════════════════════════════════════
+const CB_COLOURS=[
+  {name:'Golden',inhale:'#ffd700',exhale:'#6a0dad',inhalePhrase:'Breathe in warmth and radiance…',exhalePhrase:'Release purple doubt and shadow…',doneMsg:'Golden light fills you. Warmth restored.'},
+  {name:'Ocean',inhale:'#0099cc',exhale:'#cc6600',inhalePhrase:'Breathe in calm blue water…',exhalePhrase:'Release orange tension and heat…',doneMsg:'Cool stillness runs through you now.'},
+  {name:'Rose',inhale:'#ff6b8a',exhale:'#6bffb8',inhalePhrase:'Breathe in love and compassion…',exhalePhrase:'Release rigid green resistance…',doneMsg:'Your heart is softer now. Open.'},
+  {name:'Forest',inhale:'#4caf50',exhale:'#e91e63',inhalePhrase:'Breathe in deep green stillness…',exhalePhrase:'Release red urgency and panic…',doneMsg:'Rooted. Grounded. Still as a tree.'},
+  {name:'Violet',inhale:'#9c27b0',exhale:'#e6c229',inhalePhrase:'Breathe in deep purple wisdom…',exhalePhrase:'Release yellow noise and chatter…',doneMsg:'Clarity and depth have returned.'},
+];
+let cbColour=null,cbRound=0,cbRunning=false,cbPhase='inhale',cbTimer=null,cbRAF=null,cbPhaseStart=0;
+const CB_TOTAL=5,CB_INHALE=5000,CB_EXHALE=6000;
+function showColourScreen(id){document.querySelectorAll('#g-colour .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function colourStop(){cbRunning=false;clearTimeout(cbTimer);cancelAnimationFrame(cbRAF);}
+function initCbChips(){
+  const c=document.getElementById('cb-chips');c.innerHTML='';
+  CB_COLOURS.forEach((col,i)=>{
+    const chip=document.createElement('div');chip.className='cb-chip';chip.textContent=col.name;
+    chip.style.borderColor=col.inhale+'55';
+    chip.onclick=()=>{document.querySelectorAll('.cb-chip').forEach(c=>c.classList.remove('selected'));chip.classList.add('selected');chip.style.borderColor=col.inhale;chip.style.color=col.inhale;cbColour=col;document.getElementById('cb-start-btn').disabled=false;};
+    c.appendChild(chip);
+  });
+}
+initCbChips();
+function colourStart(){
+  if(!cbColour)return;
+  cbRound=0;cbRunning=true;cbPhase='inhale';
+  document.getElementById('cb-total').textContent=CB_TOTAL;
+  showColourScreen('cb-breathe');
+  cbStartPhase('inhale');
+}
+function cbStartPhase(phase){
+  if(!cbRunning)return;
+  cbPhase=phase;cbPhaseStart=performance.now();
+  const dur=phase==='inhale'?CB_INHALE:CB_EXHALE;
+  const colour=phase==='inhale'?cbColour.inhale:cbColour.exhale;
+  document.getElementById('cb-phase-lbl').textContent=phase==='inhale'?'Inhale':'Exhale';
+  document.getElementById('cb-phrase').textContent=phase==='inhale'?cbColour.inhalePhrase:cbColour.exhalePhrase;
+  document.getElementById('cb-orb').style.background=`radial-gradient(circle,${colour},${colour}66)`;
+  document.getElementById('cb-orb').style.boxShadow=`0 0 40px 12px ${colour}44`;
+  document.getElementById('cb-orb').textContent=phase==='inhale'?'↑ Inhale':'↓ Exhale';
+  document.getElementById('cb-bar').style.background=colour;
+  cbSoundPhase(cbColour,phase==='inhale');haptic(phase==='inhale'?[25]:[45]);
+  cancelAnimationFrame(cbRAF);
+  function tick(now){
+    if(!cbRunning)return;
+    const p=Math.min((now-cbPhaseStart)/dur,1);
+    document.getElementById('cb-bar').style.width=(p*100)+'%';
+    const sc=phase==='inhale'?0.85+p*0.3:1.15-p*0.3;
+    document.getElementById('cb-orb').style.transform=`scale(${sc})`;
+    if(p<1)cbRAF=requestAnimationFrame(tick);
+  }
+  cbRAF=requestAnimationFrame(tick);
+  clearTimeout(cbTimer);
+  cbTimer=setTimeout(()=>{
+    if(!cbRunning)return;
+    if(phase==='inhale')cbStartPhase('exhale');
+    else{
+      cbRound++;document.getElementById('cb-round').textContent=cbRound;
+      if(cbRound>=CB_TOTAL){cbRunning=false;document.getElementById('cb-done-msg').textContent=cbColour.doneMsg;cbSoundComplete();haptic([40,60,40,60,100]);showColourScreen('cb-done');}
+      else cbStartPhase('inhale');
+    }
+  },dur);
+}
+
+// ══════════════════════════════════════════════════
+// GAME 9: FLOW STATE
+// ══════════════════════════════════════════════════
+let flCombo=0,flBestCombo=0,flRunning=false,flRipples=[],flRAF=null,flCanvas=null,flCtx=null,flGameTimer=null;
+const FL_DURATION=60000,FL_RIPPLE_INTERVAL=1800,FL_RIPPLE_LIFESPAN=3200;
+function showFlowScreen(id){document.querySelectorAll('#g-flow .game-screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function flowStop(){flRunning=false;cancelAnimationFrame(flRAF);clearTimeout(flGameTimer);flRipples=[];}
+function flowStart(){
+  flowStop();flCombo=0;flBestCombo=0;flRunning=true;
+  document.getElementById('fl-score').textContent='0';document.getElementById('fl-combo').textContent='';
+  flCanvas=document.getElementById('flow-canvas');
+  flCanvas.width=window.innerWidth;flCanvas.height=window.innerHeight;
+  flCtx=flCanvas.getContext('2d');
+  showFlowScreen('fl-play');
+  spawnFlRipple();drawFlow();
+  // Spawn ripples on interval
+  let spawnInt=setInterval(()=>{if(flRunning)spawnFlRipple();else clearInterval(spawnInt);},FL_RIPPLE_INTERVAL);
+  // Game timer
+  flGameTimer=setTimeout(()=>{flRunning=false;cancelAnimationFrame(flRAF);clearInterval(spawnInt);flowDone();},FL_DURATION);
+}
+function spawnFlRipple(){
+  const margin=60;
+  const x=margin+Math.random()*(window.innerWidth-margin*2);
+  const y=100+Math.random()*(window.innerHeight-220);
+  flRipples.push({x,y,born:Date.now(),tapped:false,id:Math.random()});
+}
+function drawFlow(){
+  if(!flRunning)return;
+  flCtx.clearRect(0,0,flCanvas.width,flCanvas.height);
+  const now=Date.now();
+  // Background subtle glow
+  flRipples=flRipples.filter(r=>(now-r.born)<FL_RIPPLE_LIFESPAN+200);
+  flRipples.forEach(r=>{
+    const age=now-r.born;const lifeP=age/FL_RIPPLE_LIFESPAN;
+    if(r.tapped)return;
+    const maxR=Math.min(window.innerWidth,window.innerHeight)*0.22;
+    const radius=lifeP*maxR;
+    const alpha=Math.max(0,(1-lifeP)*0.85);
+    // Outer ring
+    flCtx.beginPath();flCtx.arc(r.x, r.y, Math.max(0,radius), 0, Math.PI*2);
+    flCtx.strokeStyle=`rgba(80,220,220,${alpha*0.7})`;flCtx.lineWidth=2;flCtx.stroke();
+    // Sweet spot ring (tap zone: when lifeP is 0.3–0.7)
+    const inZone=lifeP>0.25&&lifeP<0.75;
+    if(inZone){
+      const zoneAlpha=(0.5-Math.abs(lifeP-0.5))*2;
+      flCtx.beginPath();flCtx.arc(r.x, r.y, Math.max(0,radius), 0, Math.PI*2);
+      flCtx.strokeStyle=`rgba(120,240,240,${zoneAlpha*0.5})`;flCtx.lineWidth=6;flCtx.stroke();
+    }
+    // Center dot
+    flCtx.beginPath();flCtx.arc(r.x,r.y,4,0,Math.PI*2);
+    flCtx.fillStyle=`rgba(180,240,240,${alpha})`;flCtx.fill();
+  });
+  flRAF=requestAnimationFrame(drawFlow);
+}
+document.getElementById('fl-play').addEventListener('pointerdown',function(e){
+  if(!flRunning)return;
+  e.stopPropagation();
+  const mx=e.clientX,my=e.clientY,now=Date.now();
+  let hit=false;
+  for(let i=flRipples.length-1;i>=0;i--){
+    const r=flRipples[i];if(r.tapped)continue;
+    const age=now-r.born;const lifeP=age/FL_RIPPLE_LIFESPAN;
+    const maxR=Math.min(window.innerWidth,window.innerHeight)*0.22;
+    const radius=lifeP*maxR;
+    const dist=Math.hypot(r.x-mx,r.y-my);
+    if(dist<radius+20&&dist>radius-30&&!r.tapped){
+      const inZone=lifeP>0.25&&lifeP<0.75;
+      r.tapped=true;hit=true;
+      if(inZone){flCombo++;if(flCombo>flBestCombo)flBestCombo=flCombo;}
+      else{flCombo=Math.max(0,flCombo-1);}
+      document.getElementById('fl-combo').textContent=flCombo>1?`✦ ${flCombo} streak`:'';
+      flSoundHit(flCombo);haptic(inZone?[15,10,20]:8);
+      // Splash effect
+      flCtx.beginPath();flCtx.arc(r.x, r.y, Math.max(0,radius), 0, Math.PI*2);
+      flCtx.strokeStyle='rgba(180,240,240,0.8)';flCtx.lineWidth=3;flCtx.stroke();
+      break;
+    }
+  }
+  if(!hit){flCombo=0;document.getElementById('fl-combo').textContent='';flSoundMiss();haptic(5);}
+});
+function flowDone(){
+  document.getElementById('fl-final-combo').textContent=flBestCombo;
+  flSoundComplete();haptic([40,60,40]);showFlowScreen('fl-done');
+}
+
+// ══════════════════════════════════════════════════
+// GAME 10: WEATHER MIND
+// ══════════════════════════════════════════════════
+const WM_WEATHERS = [
+  { id:'storm',     icon:'⛈️',  label:'Stormy',     color:'#6080b0', desc:'Heavy, turbulent, overwhelming',
+    phrases:['Let the storm pass through…','Each thunderclap fades…','You are wider than this storm…'],
+    endIcon:'🌤️', endTitle:'The storm is lifting.', endMsg:'Storms pass. They always do. You weathered this one too.' },
+  { id:'fog',       icon:'🌫️',  label:'Foggy',      color:'#90a0b0', desc:'Unclear, numb, uncertain',
+    phrases:['The fog is natural…','Clarity comes in its own time…','Rest in the not-knowing…'],
+    endIcon:'☀️', endTitle:'The fog is clearing.', endMsg:'What was hidden in fog slowly becomes visible. You are still here.' },
+  { id:'rain',      icon:'🌧️',  label:'Rainy',      color:'#7090c0', desc:'Sad, heavy, releasing',
+    phrases:['Let it rain inside you…','Each drop releases something…','Rain nourishes what comes next…'],
+    endIcon:'🌈', endTitle:'The rain has passed.', endMsg:'After rain, the air is fresh. Something has been released in you.' },
+  { id:'cloudy',    icon:'☁️',  label:'Cloudy',     color:'#8090a8', desc:'Dull, flat, low energy',
+    phrases:['Clouds move whether we watch or not…','Behind every cloud…','Rest in the grey…'],
+    endIcon:'🌥️', endTitle:'A break in the clouds.', endMsg:'Even on overcast days, the sun is still there. So are you.' },
+  { id:'windy',     icon:'🌬️',  label:'Windy',      color:'#80b0c0', desc:'Restless, scattered, anxious',
+    phrases:['Watch the wind, don\'t become it…','Let the thoughts blow through…','Stillness lives beneath the wind…'],
+    endIcon:'🍃', endTitle:'The wind is settling.', endMsg:'Restlessness passes. Beneath the wind is always stillness.' },
+  { id:'sunny',     icon:'☀️',  label:'Sunny',      color:'#e0c060', desc:'Bright, open, grateful',
+    phrases:['Let this warmth reach every corner…','Breathe in the light…','You are this brightness…'],
+    endIcon:'✨', endTitle:'Radiant.', endMsg:'You arrived sunny. Let that warmth carry forward.' },
+  { id:'mixed',     icon:'🌦️',  label:'Mixed',      color:'#90a8c0', desc:'Up and down, unpredictable',
+    phrases:['Mixed weather is honest weather…','Hold space for all of it…','Contradictions can coexist…'],
+    endIcon:'🌤️', endTitle:'Balance returning.', endMsg:'Holding everything at once takes courage. You did.' },
+  { id:'hail',      icon:'🌨️',  label:'Harsh',      color:'#7080a0', desc:'Sharp, painful, relentless',
+    phrases:['This is hard. Breathe anyway…','Each breath is shelter…','You are stronger than this weather…'],
+    endIcon:'🌱', endTitle:'The harshness has passed.', endMsg:'You endured something difficult. That matters.' },
+];
+
+const WM_BREATHS = [
+  { inhale:4, hold:0, exhale:6, label:'4-6 Calm' },
+  { inhale:4, hold:4, exhale:4, label:'Box Breath' },
+  { inhale:5, hold:0, exhale:7, label:'5-7 Release' },
+];
+
+let wmRunning=false, wmRAF=null, wmTimer=null, wmCv=null, wmCtx=null;
+let wmWeather=null, wmParticles=[], wmBreathCount=0, wmElapsed=0;
+let wmPhase='inhale', wmPhaseStart=0, wmPhaseDur=4000, wmBreathPattern=null;
+let wmStartTime=0, wmDuration=120000; // 2 min session
+
+function showWeatherScreen(id){
+  document.querySelectorAll('#g-weather .game-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function weatherStart(){
+  weatherStop();
+  // Build weather grid
+  const grid=document.getElementById('wm-weather-grid');
+  grid.innerHTML='';
+  WM_WEATHERS.forEach(w=>{
+    const btn=document.createElement('button');
+    btn.style.cssText=`background:rgba(${hexToRgb(w.color)},0.12);border:1px solid rgba(${hexToRgb(w.color)},0.35);border-radius:12px;padding:12px 8px;cursor:pointer;text-align:center;transition:all 0.2s;color:rgba(200,220,240,0.85);font-family:'Cormorant Garamond',serif;`;
+    btn.innerHTML=`<div style="font-size:22px;margin-bottom:4px;">${w.icon}</div><div style="font-size:13px;font-weight:400;">${w.label}</div><div style="font-size:10px;opacity:0.55;margin-top:2px;">${w.desc}</div>`;
+    btn.onclick=()=>wmPickWeather(w);
+    grid.appendChild(btn);
+  });
+  showWeatherScreen('wm-pick');
+}
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function wmPickWeather(w){
+  wmWeather=w;
+  wmRunning=true; wmBreathCount=0; wmElapsed=0;
+  wmStartTime=Date.now();
+  wmBreathPattern=WM_BREATHS[Math.floor(Math.random()*WM_BREATHS.length)];
+  wmPhaseDur=(wmBreathPattern.inhale)*1000;
+  wmPhase='inhale'; wmPhaseStart=Date.now();
+
+  document.getElementById('wm-from-lbl').textContent=`feeling ${w.label.toLowerCase()}`;
+  document.getElementById('wm-icon-lbl').textContent=w.icon;
+  document.getElementById('wm-breath-phrase').textContent=w.phrases[0];
+  document.getElementById('wm-to-lbl').textContent='slowly clearing…';
+  document.getElementById('wm-progress-bar').style.width='0%';
+
+  // Setup canvas
+  wmCv=document.getElementById('weather-canvas');
+  wmCv.width=window.innerWidth; wmCv.height=window.innerHeight;
+  wmCtx=wmCv.getContext('2d');
+  wmInitParticles();
+
+  showWeatherScreen('wm-watch');
+  wmSoundStart();
+  haptic(15);
+  cancelAnimationFrame(wmRAF);
+  wmDrawLoop();
+  wmBreathCycle();
+}
+
+function wmInitParticles(){
+  wmParticles=[];
+  const W=wmCv.width, H=wmCv.height, w=wmWeather;
+  if(['storm','rain','hail'].includes(w.id)){
+    // Rain drops
+    for(let i=0;i<60;i++) wmParticles.push({
+      type:'rain', x:Math.random()*W, y:Math.random()*H,
+      vy:3+Math.random()*4, vx:-0.5-Math.random(),
+      len:8+Math.random()*12, alpha:0.12+Math.random()*0.2
+    });
+  }
+  if(w.id==='storm'){
+    // Lightning flicker state
+    wmParticles.push({type:'lightning',next:Date.now()+2000+Math.random()*3000,alpha:0});
+  }
+  if(['fog','cloudy'].includes(w.id)){
+    // Fog wisps
+    for(let i=0;i<8;i++) wmParticles.push({
+      type:'fog', x:Math.random()*W, y:H*0.2+Math.random()*H*0.6,
+      vx:0.2+Math.random()*0.3, r:60+Math.random()*100,
+      alpha:0.04+Math.random()*0.04, phase:Math.random()*Math.PI*2
+    });
+  }
+  if(w.id==='windy'){
+    // Wind streaks
+    for(let i=0;i<20;i++) wmParticles.push({
+      type:'wind', x:Math.random()*W, y:Math.random()*H,
+      vx:3+Math.random()*4, len:30+Math.random()*60,
+      alpha:0.06+Math.random()*0.1, phase:Math.random()*Math.PI*2
+    });
+  }
+  if(w.id==='sunny'){
+    // Light rays from top
+    for(let i=0;i<6;i++) wmParticles.push({
+      type:'ray', angle:-Math.PI/2+(i-2.5)*0.18,
+      len:H*0.55, alpha:0.04+Math.random()*0.03
+    });
+    // Floating motes
+    for(let i=0;i<25;i++) wmParticles.push({
+      type:'mote', x:Math.random()*W, y:Math.random()*H,
+      vy:-0.3-Math.random()*0.4, r:0.8+Math.random()*1.2,
+      phase:Math.random()*Math.PI*2, alpha:0.2+Math.random()*0.3
+    });
+  }
+  if(w.id==='mixed'){
+    for(let i=0;i<20;i++) wmParticles.push({
+      type:'rain', x:Math.random()*W, y:Math.random()*H,
+      vy:2+Math.random()*3, vx:-0.3, len:6+Math.random()*8, alpha:0.1
+    });
+    for(let i=0;i<4;i++) wmParticles.push({
+      type:'fog', x:Math.random()*W, y:H*0.1+Math.random()*H*0.4,
+      vx:0.3, r:70+Math.random()*80, alpha:0.04, phase:i
+    });
+  }
+  if(w.id==='hail'){
+    for(let i=0;i<35;i++) wmParticles.push({
+      type:'hail', x:Math.random()*W, y:Math.random()*H,
+      vy:5+Math.random()*5, vx:(Math.random()-.5)*2,
+      r:1.5+Math.random()*2, alpha:0.25+Math.random()*0.3
+    });
+  }
+}
+
+function wmDrawLoop(){
+  if(!wmRunning) return;
+  const W=wmCv.width, H=wmCv.height;
+  const elapsed=Date.now()-wmStartTime;
+  const progress=Math.min(elapsed/wmDuration,1);
+  // Clearing factor: particles fade as session progresses
+  const clearF=Math.pow(progress,0.6); // 0→1 over session
+
+  wmCtx.clearRect(0,0,W,H);
+
+  // Breathing orb — central presence
+  const phaseElapsed=Date.now()-wmPhaseStart;
+  let breathT=0;
+  if(wmPhase==='inhale') breathT=Math.min(phaseElapsed/wmPhaseDur,1);
+  else if(wmPhase==='hold') breathT=1;
+  else breathT=1-Math.min(phaseElapsed/wmPhaseDur,1);
+  const orbR=Math.max(0, 28+breathT*22);
+  const [cr,cg,cb]=wmWeather.color.slice(1).match(/.{2}/g).map(x=>parseInt(x,16));
+  // Outer glow
+  const grd=wmCtx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(0,orbR*3.5));
+  grd.addColorStop(0,`rgba(${cr},${cg},${cb},${0.12*(1-clearF*0.7)})`);
+  grd.addColorStop(1,`rgba(${cr},${cg},${cb},0)`);
+  wmCtx.beginPath(); wmCtx.arc(W/2,H/2,Math.max(0,orbR*3.5),0,Math.PI*2);
+  wmCtx.fillStyle=grd; wmCtx.fill();
+  // Core orb
+  wmCtx.beginPath(); wmCtx.arc(W/2,H/2,Math.max(0,orbR),0,Math.PI*2);
+  wmCtx.fillStyle=`rgba(${cr},${cg},${cb},${0.35*(1-clearF*0.5)})`; wmCtx.fill();
+  // Clearing ring — grows as weather clears
+  if(clearF>0.1){
+    wmCtx.beginPath(); wmCtx.arc(W/2,H/2,Math.max(0,orbR+20+clearF*60),0,Math.PI*2);
+    wmCtx.strokeStyle=`rgba(200,230,255,${clearF*0.12})`; wmCtx.lineWidth=1; wmCtx.stroke();
+  }
+
+  // Weather particles — fade with clearF
+  const fadeA=1-clearF*0.85;
+  const now=Date.now();
+  wmParticles.forEach(p=>{
+    if(p.type==='rain'){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y>H){p.y=-10;p.x=Math.random()*W;}
+      wmCtx.beginPath(); wmCtx.moveTo(p.x,p.y); wmCtx.lineTo(p.x+p.vx*2,p.y+p.len);
+      wmCtx.strokeStyle=`rgba(120,170,220,${p.alpha*fadeA})`; wmCtx.lineWidth=0.8; wmCtx.stroke();
+    } else if(p.type==='hail'){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y>H){p.y=-5;p.x=Math.random()*W;}
+      wmCtx.beginPath(); wmCtx.arc(p.x,p.y,Math.max(0,p.r),0,Math.PI*2);
+      wmCtx.fillStyle=`rgba(200,220,240,${p.alpha*fadeA})`; wmCtx.fill();
+    } else if(p.type==='fog'){
+      p.x+=p.vx; if(p.x>W+120)p.x=-120;
+      const fa=p.alpha*(0.7+0.3*Math.sin(now*0.0005+p.phase))*fadeA;
+      const fg=wmCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,Math.max(0,p.r));
+      fg.addColorStop(0,`rgba(160,180,210,${fa})`);
+      fg.addColorStop(1,`rgba(160,180,210,0)`);
+      wmCtx.beginPath(); wmCtx.arc(p.x,p.y,Math.max(0,p.r),0,Math.PI*2);
+      wmCtx.fillStyle=fg; wmCtx.fill();
+    } else if(p.type==='wind'){
+      p.x+=p.vx; if(p.x>W+80)p.x=-80;
+      const wa=p.alpha*(0.5+0.5*Math.sin(now*0.002+p.phase))*fadeA;
+      wmCtx.beginPath(); wmCtx.moveTo(p.x,p.y); wmCtx.lineTo(p.x-p.len,p.y+4);
+      wmCtx.strokeStyle=`rgba(180,210,230,${wa})`; wmCtx.lineWidth=0.7; wmCtx.stroke();
+    } else if(p.type==='lightning'){
+      if(now>p.next && p.alpha<=0){
+        p.alpha=0.6; p.next=now+2500+Math.random()*4000;
+      }
+      if(p.alpha>0){
+        wmCtx.fillStyle=`rgba(200,220,255,${p.alpha*fadeA*0.08})`;
+        wmCtx.fillRect(0,0,W,H);
+        p.alpha=Math.max(0,p.alpha-0.06);
+      }
+    } else if(p.type==='ray'){
+      const ra=p.alpha*(0.6+0.4*Math.sin(now*0.0008))*fadeA;
+      wmCtx.beginPath(); wmCtx.moveTo(W/2,0);
+      wmCtx.lineTo(W/2+Math.cos(p.angle)*p.len,Math.sin(p.angle)*p.len);
+      wmCtx.strokeStyle=`rgba(255,230,150,${ra})`; wmCtx.lineWidth=18;
+      wmCtx.stroke();
+    } else if(p.type==='mote'){
+      p.y+=p.vy;
+      if(p.y<-5)p.y=H+5;
+      const ma=p.alpha*(0.5+0.5*Math.sin(now*0.001+p.phase))*fadeA;
+      wmCtx.beginPath(); wmCtx.arc(p.x,p.y,Math.max(0,p.r),0,Math.PI*2);
+      wmCtx.fillStyle=`rgba(255,240,180,${ma})`; wmCtx.fill();
+    }
+  });
+
+  // Progress bar
+  document.getElementById('wm-progress-bar').style.width=(progress*100)+'%';
+
+  // Session complete
+  if(progress>=1){ wmComplete(); return; }
+
+  wmRAF=requestAnimationFrame(wmDrawLoop);
+}
+
+function wmBreathCycle(){
+  if(!wmRunning) return;
+  const bp=wmBreathPattern;
+  const phases=[
+    {name:'inhale',dur:bp.inhale*1000,label:'Breathe in…'},
+    {name:'hold',dur:bp.hold*1000,label:'Hold…'},
+    {name:'exhale',dur:bp.exhale*1000,label:'Breathe out…'},
+  ].filter(p=>p.dur>0);
+
+  let idx=0;
+  function nextPhase(){
+    if(!wmRunning) return;
+    const phase=phases[idx%phases.length];
+    wmPhase=phase.name; wmPhaseStart=Date.now(); wmPhaseDur=phase.dur;
+    if(phase.name==='inhale'){
+      wmBreathCount++;
+      const phraseIdx=Math.min(Math.floor(wmBreathCount/4), wmWeather.phrases.length-1);
+      document.getElementById('wm-breath-phrase').textContent=wmWeather.phrases[phraseIdx];
+      wmSoundBreath(wmBreathCount);
+    }
+    document.getElementById('wm-to-lbl').textContent=phase.label;
+    idx++;
+    wmTimer=setTimeout(nextPhase, phase.dur);
+  }
+  nextPhase();
+}
+
+function weatherStop(){
+  wmRunning=false;
+  cancelAnimationFrame(wmRAF);
+  clearTimeout(wmTimer);
+  if(wmCtx && wmCv) wmCtx.clearRect(0,0,wmCv.width,wmCv.height);
+}
+
+function wmComplete(){
+  wmRunning=false; cancelAnimationFrame(wmRAF); clearTimeout(wmTimer);
+  const w=wmWeather;
+  document.getElementById('wm-done-icon').textContent=w.endIcon;
+  document.getElementById('wm-done-title').textContent=w.endTitle;
+  document.getElementById('wm-done-msg').textContent=w.endMsg;
+  document.getElementById('wm-final-breaths').textContent=wmBreathCount;
+  document.getElementById('wm-final-time').textContent=Math.round(wmDuration/1000);
+  wmSoundComplete(); haptic([30,20,40,20,60]);
+  showWeatherScreen('wm-done');
+}
+
+// Weather sounds
+function wmSoundStart(){
+  const ac=getAC(); if(!ac||!soundOn) return;
+  const o=ac.createOscillator(), g=ac.createGain();
+  o.type='sine'; o.frequency.setValueAtTime(220,ac.currentTime);
+  o.frequency.linearRampToValueAtTime(280,ac.currentTime+2);
+  g.gain.setValueAtTime(0,ac.currentTime);
+  g.gain.linearRampToValueAtTime(0.05,ac.currentTime+0.8);
+  g.gain.linearRampToValueAtTime(0,ac.currentTime+2.5);
+  o.connect(g); g.connect(ac.destination);
+  o.start(); o.stop(ac.currentTime+2.5);
+  _activeNodes.push(o);
+}
+function wmSoundBreath(count){
+  const ac=getAC(); if(!ac||!soundOn) return;
+  const freqs=[261,293,329,349];
+  const f=freqs[count%freqs.length];
+  const o=ac.createOscillator(), g=ac.createGain();
+  o.type='sine'; o.frequency.value=f;
+  g.gain.setValueAtTime(0,ac.currentTime);
+  g.gain.linearRampToValueAtTime(0.04,ac.currentTime+0.3);
+  g.gain.linearRampToValueAtTime(0,ac.currentTime+1.2);
+  o.connect(g); g.connect(ac.destination);
+  o.start(); o.stop(ac.currentTime+1.2);
+  _activeNodes.push(o);
+}
+function wmSoundComplete(){
+  const ac=getAC(); if(!ac||!soundOn) return;
+  [261,329,392,523].forEach((f,i)=>{
+    const o=ac.createOscillator(), g=ac.createGain();
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,ac.currentTime+i*0.18);
+    g.gain.linearRampToValueAtTime(0.07,ac.currentTime+i*0.18+0.2);
+    g.gain.linearRampToValueAtTime(0,ac.currentTime+i*0.18+1.8);
+    o.connect(g); g.connect(ac.destination);
+    o.start(ac.currentTime+i*0.18); o.stop(ac.currentTime+i*0.18+2);
+    _activeNodes.push(o);
+  });
+}
+
 </script>
 </body>
 </html>
