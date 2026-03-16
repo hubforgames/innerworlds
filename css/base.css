@@ -6,7 +6,7 @@ color:white;
 overflow-x:hidden;
 }
 
-/* star background */
+/* star canvas */
 
 canvas{
 position:fixed;
@@ -18,36 +18,61 @@ z-index:1;
 pointer-events:none;
 }
 
-/* main container */
+/* moon */
+
+.moon{
+position:fixed;
+top:80px;
+right:60px;
+width:120px;
+height:120px;
+border-radius:50%;
+background:radial-gradient(circle at 30% 30%, #fff, #ddd 40%, #bbb 70%);
+box-shadow:
+0 0 40px rgba(255,255,255,0.6),
+0 0 120px rgba(200,200,255,0.4);
+opacity:0.9;
+z-index:1;
+animation:moonDrift 60s linear infinite;
+}
+
+@keyframes moonDrift{
+0%{transform:translateY(0px);}
+50%{transform:translateY(20px);}
+100%{transform:translateY(0px);}
+}
+
+/* hub */
 
 .hub{
 position:relative;
 z-index:2;
 text-align:center;
-padding:40px 20px;
+padding:60px 20px;
 }
 
-/* title */
-
 .title{
-font-size:40px;
-letter-spacing:2px;
+font-size:42px;
 margin-bottom:10px;
 }
 
-/* subtitle */
-
 .subtitle{
 opacity:0.8;
-margin-bottom:50px;
+margin-bottom:60px;
 font-size:18px;
 }
 
-/* portal layout */
+/* mobile */
 
-.portal-container{
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:40px;
+@media (max-width:600px){
+
+.title{
+font-size:34px;
+}
+
+.portal{
+width:180px;
+height:180px;
+}
+
 }
