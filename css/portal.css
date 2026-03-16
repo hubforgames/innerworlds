@@ -1,3 +1,11 @@
+.portal-container{
+display:flex;
+justify-content:center;
+gap:60px;
+flex-wrap:wrap;
+margin-top:40px;
+}
+
 .portal{
 width:220px;
 height:220px;
@@ -9,11 +17,24 @@ align-items:center;
 position:relative;
 cursor:pointer;
 transition:0.4s;
+text-align:center;
 }
 
 .portal h2{
 margin:10px 0 4px 0;
+font-size:22px;
+position:relative;
+z-index:2;
 }
+
+.portal p{
+opacity:0.8;
+font-size:14px;
+position:relative;
+z-index:2;
+}
+
+/* spinning portal ring */
 
 .portal-ring{
 position:absolute;
@@ -22,11 +43,16 @@ height:100%;
 border-radius:50%;
 border:3px solid rgba(255,255,255,0.2);
 animation:spin 10s linear infinite;
+z-index:1;
 }
+
+/* hover effect */
 
 .portal:hover{
 transform:scale(1.08);
 }
+
+/* portal glow colors */
 
 .stillness{
 box-shadow:0 0 40px rgba(100,200,255,0.6);
@@ -39,6 +65,8 @@ box-shadow:0 0 40px rgba(180,120,255,0.6);
 .blog{
 box-shadow:0 0 40px rgba(255,200,120,0.7);
 }
+
+/* spinning animation */
 
 @keyframes spin{
 from{transform:rotate(0deg);}
