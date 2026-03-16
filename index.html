@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,454 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inner Worlds</title>
 
-<style>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/portals.css">
 
-html,body{
-margin:0;
-padding:0;
-overflow:hidden;
-font-family:Georgia,serif;
-background:#02040d;
-color:white;
-}
-
-#app{
-display:flex;
-width:300vw;
-height:100vh;
-transition:transform .7s ease;
-}
-
-.realm{
-width:100vw;
-height:100vh;
-position:relative;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.realm-inner{
-text-align:center;
-z-index:2;
-max-width:900px;
-}
-
-.stillness{background:#08232c;}
-.hub{background:#03061a;}
-.sleep{background:#02030b;}
-
-.cards{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-justify-content:center;
-margin-bottom:20px;
-}
-
-.card{
-background:rgba(255,255,255,0.05);
-border:1px solid rgba(255,255,255,0.15);
-padding:10px 14px;
-border-radius:10px;
-cursor:pointer;
-}
-
-.card:hover{
-background:rgba(255,255,255,0.12);
-}
-
-.portal-row{
-display:flex;
-gap:20px;
-justify-content:center;
-margin:20px;
-}
-
-.portal{
-padding:20px 30px;
-border-radius:20px;
-background:rgba(255,255,255,0.06);
-}
-
-.journey{
-padding:12px 26px;
-border-radius:30px;
-border:none;
-background:#f0c87a;
-color:black;
-margin-bottom:20px;
-cursor:pointer;
-}
-
-canvas{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-}
-
-.overlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:black;
-z-index:10;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-}
-
-.hidden{
-display:none;
-}
-
-#closeLantern{
-position:absolute;
-top:20px;
-left:20px;
-}
-
-</style>
 </head>
 
 <body>
 
-<div id="app">
+<canvas id="stars"></canvas>
 
-<section class="realm stillness">
-<div class="realm-inner">
-<h1>🌊 Stillness</h1>
-<p>Ground the mind</p>
-<div class="cards">
-<div class="card">Still Waters</div>
-<div class="card">Root</div>
-<div class="card">Drift</div>
-<div class="card">Ember Mind</div>
-<div class="card">Focus</div>
-<div class="card">Flow State</div>
-<div class="card">Colour Breath</div>
-<div class="card">Constellation</div>
-<div class="card">Weather Mind</div>
-</div>
-</div>
-</section>
+<div class="hub">
 
-<section class="realm hub">
-<canvas id="hubParticles"></canvas>
-<div class="realm-inner">
-<h1>✨ Inner Worlds</h1>
-<p>Paths to stillness & sleep</p>
-<div class="portal-row">
-<div class="portal">🌊 Stillness</div>
-<div class="portal">🌙 Sleep</div>
-</div>
-<p>Swipe or use arrow keys</p>
-</div>
-</section>
+<h1 class="title">Inner Worlds</h1>
+<p class="subtitle">Paths to stillness & sleep</p>
 
-<section class="realm sleep">
+<div class="portal-container">
 
-<canvas id="sky"></canvas>
-
-<div class="realm-inner">
-
-<h1>🌙 Sleep</h1>
-
-<button id="journeyBtn" class="journey">Start Sleep Journey</button>
-
-<h3>Clear Your Mind</h3>
-<div class="cards">
-<div class="card" id="lanternBtn">Lantern River</div>
-<div class="card">Shelf</div>
-<div class="card">Night Train</div>
-<div class="card">Cloud Fade</div>
-<div class="card">Thought Dissolve</div>
+<div class="portal stillness">
+<div class="portal-ring"></div>
+<h2>Stillness</h2>
+<p>Find your calm</p>
 </div>
 
-<h3>Drift Toward Sleep</h3>
-<div class="cards">
-<div class="card">Star Drift</div>
-<div class="card">Firefly Garden</div>
-<div class="card">Breathing Forest</div>
-<div class="card">Dream Doors</div>
-<div class="card">Sleep Wind-down</div>
+<div class="portal sleep">
+<div class="portal-ring"></div>
+<h2>Sleep</h2>
+<p>Drift into rest</p>
+</div>
+
+<div class="portal blog">
+<div class="portal-ring"></div>
+<h2>Read & Heal</h2>
+<p>Visit the blog</p>
 </div>
 
 </div>
-</section>
 
 </div>
 
-<div id="lanternScene" class="overlay hidden">
-<canvas id="river"></canvas>
-<button id="closeLantern">Back</button>
-</div>
-
-<script>
-
-/* SWIPE REALMS */
-
-let page=1
-const app=document.getElementById("app")
-let startX=0
-
-function update(){
-app.style.transform=`translateX(${-page*100}vw)`
-}
-
-document.addEventListener("touchstart",e=>{
-startX=e.touches[0].clientX
-})
-
-document.addEventListener("touchend",e=>{
-let dx=e.changedTouches[0].clientX-startX
-if(dx>50 && page>0) page--
-if(dx<-50 && page<2) page++
-update()
-})
-
-document.addEventListener("keydown",e=>{
-if(e.key==="ArrowRight" && page<2) page++
-if(e.key==="ArrowLeft" && page>0) page--
-update()
-})
-
-/* HUB PARTICLES */
-
-const hub=document.getElementById("hubParticles")
-if(hub){
-
-const ctx=hub.getContext("2d")
-
-function resize(){
-hub.width=window.innerWidth
-hub.height=window.innerHeight
-}
-resize()
-window.addEventListener("resize",resize)
-
-let p=[]
-for(let i=0;i<80;i++){
-p.push({x:Math.random()*hub.width,y:Math.random()*hub.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3})
-}
-
-function draw(){
-
-ctx.clearRect(0,0,hub.width,hub.height)
-
-p.forEach(a=>{
-a.x+=a.vx
-a.y+=a.vy
-
-if(a.x<0||a.x>hub.width) a.vx*=-1
-if(a.y<0||a.y>hub.height) a.vy*=-1
-
-ctx.fillStyle="rgba(255,255,255,0.4)"
-ctx.fillRect(a.x,a.y,2,2)
-})
-
-requestAnimationFrame(draw)
-
-}
-
-draw()
-
-}
-
-/* SLEEP SKY */
-
-const sky=document.getElementById("sky")
-
-if(sky){
-
-const ctx=sky.getContext("2d")
-
-function resize(){
-sky.width=window.innerWidth
-sky.height=window.innerHeight
-}
-resize()
-window.addEventListener("resize",resize)
-
-let moonX=-200
-let moonY=120
-
-let fireflies=[]
-for(let i=0;i<70;i++){
-fireflies.push({x:Math.random()*sky.width,y:Math.random()*sky.height,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,r:2+Math.random()*2})
-}
-
-sky.addEventListener("click",e=>{
-
-fireflies.forEach(f=>{
-
-let dx=e.clientX-f.x
-let dy=e.clientY-f.y
-let d=Math.sqrt(dx*dx+dy*dy)
-
-if(d<120){
-f.vx+=dx*0.0008
-f.vy+=dy*0.0008
-}
-
-})
-
-})
-
-let stars=[]
-
-function spawnStar(){
-
-if(Math.random()<0.004){
-stars.push({x:0,y:Math.random()*200,vx:8,life:90})
-}
-
-}
-
-function draw(){
-
-ctx.fillStyle="#02030b"
-ctx.fillRect(0,0,sky.width,sky.height)
-
-moonX+=0.03
-if(moonX>sky.width+200) moonX=-200
-
-ctx.beginPath()
-ctx.arc(moonX,moonY,40,0,Math.PI*2)
-ctx.fillStyle="#f6e7c9"
-ctx.shadowBlur=40
-ctx.shadowColor="#ffe9a8"
-ctx.fill()
-ctx.shadowBlur=0
-
-fireflies.forEach(f=>{
-
-f.x+=f.vx
-f.y+=f.vy
-
-ctx.beginPath()
-ctx.arc(f.x,f.y,f.r,0,Math.PI*2)
-ctx.fillStyle="rgba(255,230,150,0.9)"
-ctx.fill()
-
-})
-
-stars.forEach(s=>{
-
-s.x+=s.vx
-s.life--
-ctx.fillStyle="#fff"
-ctx.fillRect(s.x,s.y,3,1)
-
-})
-
-stars=stars.filter(s=>s.life>0)
-
-spawnStar()
-
-requestAnimationFrame(draw)
-
-}
-
-draw()
-
-}
-
-/* LANTERN RIVER */
-
-const lanternBtn=document.getElementById("lanternBtn")
-const scene=document.getElementById("lanternScene")
-const river=document.getElementById("river")
-const closeBtn=document.getElementById("closeLantern")
-
-if(lanternBtn){
-
-const ctx=river.getContext("2d")
-
-function resize(){
-river.width=window.innerWidth
-river.height=window.innerHeight
-}
-resize()
-window.addEventListener("resize",resize)
-
-let lanterns=[]
-
-lanternBtn.onclick=()=>{
-scene.classList.remove("hidden")
-}
-
-closeBtn.onclick=()=>{
-scene.classList.add("hidden")
-}
-
-river.onclick=e=>{
-lanterns.push({x:e.clientX,y:e.clientY})
-}
-
-function draw(){
-
-ctx.fillStyle="#02040a"
-ctx.fillRect(0,0,river.width,river.height)
-
-lanterns.forEach(l=>{
-
-l.y-=0.3
-
-ctx.beginPath()
-ctx.arc(l.x,l.y,8,0,Math.PI*2)
-ctx.fillStyle="#f6c87a"
-ctx.shadowBlur=20
-ctx.shadowColor="#ffc96b"
-ctx.fill()
-ctx.shadowBlur=0
-
-})
-
-requestAnimationFrame(draw)
-
-}
-
-draw()
-
-}
-
-/* SLEEP JOURNEY */
-
-const btn=document.getElementById("journeyBtn")
-
-if(btn){
-
-btn.onclick=()=>{
-
-let steps=["Shelf","Lantern River","Whisper Room","Star Drift"]
-let i=0
-
-function next(){
-
-if(i<steps.length){
-
-alert("Next stage: "+steps[i])
-
-i++
-setTimeout(next,4000)
-
-}
-
-}
-
-next()
-
-}
-
-}
-
-</script>
+<script src="js/particles.js"></script>
 
 </body>
 </html>
