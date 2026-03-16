@@ -1,45 +1,45 @@
-const canvas = document.getElementById("stars");
+ const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+function resize(){
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 }
 
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
+resize();
+window.addEventListener("resize",resize);
 
-let stars = [];
+let stars=[];
 
-for (let i = 0; i < 120; i++) {
-  stars.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    size: Math.random() * 2,
-    speed: Math.random() * 0.3
-  });
+for(let i=0;i<150;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*2,
+speed:Math.random()*0.4
+});
 }
 
-function drawStars() {
+function draw(){
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  ctx.fillStyle = "white";
+ctx.fillStyle="white";
 
-  stars.forEach(star => {
+stars.forEach(star=>{
 
-    ctx.fillRect(star.x, star.y, star.size, star.size);
+ctx.fillRect(star.x,star.y,star.size,star.size);
 
-    star.y += star.speed;
+star.y+=star.speed;
 
-    if (star.y > canvas.height) {
-      star.y = 0;
-      star.x = Math.random() * canvas.width;
-    }
-
-  });
-
-  requestAnimationFrame(drawStars);
+if(star.y>canvas.height){
+star.y=0;
+star.x=Math.random()*canvas.width;
 }
 
-drawStars();
+});
+
+requestAnimationFrame(draw);
+}
+
+draw();
