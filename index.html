@@ -15,8 +15,9 @@
 
 <body>
 
-<!-- Background star canvas -->
 <canvas id="stars"></canvas>
+
+<div class="moon"></div>
 
 <div class="hub">
 
@@ -37,7 +38,7 @@
 <p>Drift into rest</p>
 </div>
 
-<div class="portal blog">
+<div class="portal blog" onclick="window.open('https://readandhealmyfrnd.blogspot.com','_blank')">
 <div class="portal-ring"></div>
 <h2>Read & Heal</h2>
 <p>Visit the blog</p>
@@ -47,67 +48,7 @@
 
 </div>
 
-
-<script>
-
-/* canvas setup */
-
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas(){
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-}
-
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-
-/* create stars */
-
-let stars=[];
-
-for(let i=0;i<140;i++){
-
-stars.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-size:Math.random()*2,
-speed:0.2 + Math.random()*0.4
-});
-
-}
-
-
-/* animation */
-
-function animate(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-ctx.fillStyle="white";
-
-stars.forEach(star=>{
-
-ctx.fillRect(star.x,star.y,star.size,star.size);
-
-star.y += star.speed;
-
-if(star.y > canvas.height){
-star.y = 0;
-star.x = Math.random()*canvas.width;
-}
-
-});
-
-requestAnimationFrame(animate);
-
-}
-
-animate();
-
-</script>
+<script src="js/particles.js"></script>
 
 </body>
 </html>
