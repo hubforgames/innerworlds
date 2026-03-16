@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -15,7 +16,7 @@
 
 <body>
 
-<!-- star background -->
+<!-- star canvas -->
 <canvas id="stars"></canvas>
 
 
@@ -23,7 +24,6 @@
 
 <h1 class="title">Inner Worlds</h1>
 <p class="subtitle">Paths to stillness & sleep</p>
-
 
 <div class="portal-container">
 
@@ -33,13 +33,11 @@
 <p>Find your calm</p>
 </div>
 
-
 <div class="portal sleep">
 <div class="portal-ring"></div>
 <h2>Sleep</h2>
 <p>Drift into rest</p>
 </div>
-
 
 <div class="portal blog">
 <div class="portal-ring"></div>
@@ -47,13 +45,65 @@
 <p>Visit the blog</p>
 </div>
 
-
 </div>
 
 </div>
 
 
-<script src="js/particles.js"></script>
+<script>
+
+window.addEventListener("load", function(){
+
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+}
+
+resize();
+window.addEventListener("resize", resize);
+
+let stars=[];
+
+for(let i=0;i<140;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*2,
+speed:Math.random()*0.35
+});
+}
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="white";
+
+stars.forEach(star=>{
+
+ctx.fillRect(star.x,star.y,star.size,star.size);
+
+star.y+=star.speed;
+
+if(star.y>canvas.height){
+star.y=0;
+star.x=Math.random()*canvas.width;
+}
+
+});
+
+requestAnimationFrame(animate);
+
+}
+
+animate();
+
+});
+
+</script>
 
 </body>
 
