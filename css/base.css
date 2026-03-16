@@ -6,7 +6,7 @@ color:white;
 overflow-x:hidden;
 }
 
-/* star canvas */
+/* stars canvas */
 
 canvas{
 position:fixed;
@@ -27,19 +27,25 @@ right:60px;
 width:120px;
 height:120px;
 border-radius:50%;
+
 background:radial-gradient(circle at 30% 30%, #fff, #ddd 40%, #bbb 70%);
+
 box-shadow:
 0 0 40px rgba(255,255,255,0.6),
 0 0 120px rgba(200,200,255,0.4);
+
 opacity:0.9;
 z-index:1;
+
 animation:moonDrift 60s linear infinite;
 }
 
 @keyframes moonDrift{
+
 0%{transform:translateY(0px);}
 50%{transform:translateY(20px);}
 100%{transform:translateY(0px);}
+
 }
 
 /* hub */
