@@ -1,58 +1,1580 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Context Bridge</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-<title>Inner Worlds</title>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/portal.css">
+:root {
+  --sand:#f5f2ed;--sand2:#ede9e2;--sand3:#e2ddd5;--sand4:#d4cec4;
+  --ink:#1a1814;--ink2:#3d3a35;--ink3:#6b6760;--ink4:#9e9b96;
+  --rust:#c4622d;--rust-l:#f0ddd3;
+  --teal:#2d7a6b;--teal-l:#d4ede8;
+  --amber:#a87c2a;--amber-l:#f5ead6;
+  --plum:#5e3d7a;--plum-l:#e8dff0;
+  --red:#b03a2e;--red-l:#f5ddd9;
+  --border:rgba(26,24,20,0.1);--border2:rgba(26,24,20,0.18);
+  --shadow:0 1px 3px rgba(26,24,20,0.08),0 4px 16px rgba(26,24,20,0.06);
+  --shadow2:0 2px 8px rgba(26,24,20,0.1),0 12px 40px rgba(26,24,20,0.08);
+  --sans:'Inter',system-ui,sans-serif;
+  --serif:'Lora',Georgia,serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+  --r:8px;--r2:12px;
+}
 
+html{font-size:15px}
+body{background:var(--sand);color:var(--ink);font-family:var(--sans);line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+.topbar{background:var(--sand);border-bottom:1px solid var(--border2);padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand-name{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);letter-spacing:-0.01em}
+.brand-tag{font-size:11px;color:var(--ink4);font-weight:400;letter-spacing:.02em}
+.topbar-right{display:flex;align-items:center;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-teal{background:var(--teal-l);color:var(--teal)}
+.pill-rust{background:var(--rust-l);color:var(--rust)}
+.pill-plum{background:var(--plum-l);color:var(--plum)}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7}
+
+.layout{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 52px)}
+.pane{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border2)}
+.pane:last-child{border-right:none}
+
+.pane-head{padding:14px 24px 12px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;background:var(--sand)}
+.pane-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink4)}
+.pane-actions{display:flex;gap:6px;align-items:center}
+
+.ai-strip{padding:8px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0;background:var(--sand2);flex-wrap:wrap}
+.ai-strip-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);margin-right:2px}
+.chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--ink3);transition:all .13s;font-family:var(--sans)}
+.chip:hover{border-color:var(--ink3);color:var(--ink2);background:var(--sand)}
+.chip.on{background:var(--ink);color:var(--sand);border-color:var(--ink)}
+
+.pane-body{flex:1;overflow-y:auto;padding:20px 24px;scrollbar-width:thin;scrollbar-color:var(--sand3) transparent}
+.pane-body::-webkit-scrollbar{width:4px}
+.pane-body::-webkit-scrollbar-thumb{background:var(--sand3);border-radius:2px}
+
+.conv-ta{width:100%;height:100%;min-height:280px;background:transparent;border:none;outline:none;resize:none;font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--ink2);caret-color:var(--rust)}
+.conv-ta::placeholder{color:var(--ink4);font-style:italic;font-family:var(--sans);font-size:13px;line-height:1.8}
+
+.pane-foot{padding:8px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-shrink:0;background:var(--sand2)}
+.foot-stat{font-size:11px;color:var(--ink4);display:flex;align-items:center;gap:4px}
+.foot-stat b{color:var(--ink3);font-weight:500}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--sand4);transition:background .3s}
+.live-dot.on{background:var(--teal)}
+
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--r);font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--sans);transition:all .13s;letter-spacing:.01em}
+.btn-primary{background:var(--ink);color:var(--sand)}
+.btn-primary:hover{background:var(--ink2);transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn-primary:active{transform:none}
+.btn-ghost{background:transparent;color:var(--ink3);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--ink3);color:var(--ink2);background:var(--sand2)}
+.btn-sm{padding:4px 10px;font-size:11px}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;text-align:center;padding:48px 32px;color:var(--ink4)}
+.empty-glyph{font-family:var(--serif);font-size:40px;color:var(--sand4);margin-bottom:6px;font-style:italic}
+.empty-title{font-family:var(--serif);font-size:15px;font-style:italic;color:var(--ink3)}
+.empty-body{font-size:12.5px;color:var(--ink4);max-width:300px;line-height:1.7}
+
+.processing{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px}
+.proc-label{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink3)}
+.proc-track{width:200px;height:2px;background:var(--sand3);border-radius:1px;overflow:hidden}
+.proc-bar{height:100%;background:var(--rust);border-radius:1px;animation:sweep 1.6s ease-in-out infinite}
+@keyframes sweep{0%{width:0%;margin-left:0}50%{width:55%;margin-left:22%}100%{width:0%;margin-left:100%}}
+
+.scard{border:1px solid var(--border2);border-radius:var(--r2);overflow:hidden;margin-bottom:8px;background:white;box-shadow:var(--shadow)}
+.scard-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--sand2);border-bottom:1px solid var(--border)}
+.scard-label{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
+.scard-dot{width:7px;height:7px;border-radius:50%}
+.scard-body{padding:12px 14px}
+.scard-copy{padding:3px 8px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--ink4);font-family:var(--sans);transition:all .13s;letter-spacing:.02em;white-space:nowrap}
+.scard-copy:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-l)}
+.scard-copy.ok{border-color:var(--teal);color:var(--teal);background:var(--teal-l)}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--sand2);border-radius:var(--r);border:1px solid var(--border);align-items:center}
+.meta-field{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink3);flex:1;min-width:180px}
+.meta-field label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);white-space:nowrap}
+.meta-input{flex:1;background:white;border:1px solid var(--border2);border-radius:6px;padding:4px 8px;font-size:12px;font-family:var(--mono);color:var(--ink2);outline:none;transition:border-color .13s}
+.meta-input:focus{border-color:var(--teal)}
+.meta-input::placeholder{color:var(--ink4);font-style:italic;font-family:var(--sans)}
+.branch-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:600;font-family:var(--mono);background:var(--plum-l);color:var(--plum);border:1px solid rgba(94,61,122,.2)}
+.url-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10.5px;font-family:var(--mono);background:var(--teal-l);color:var(--teal);border:1px solid rgba(45,122,107,.2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;margin:2px 2px 2px 0;font-family:var(--mono)}
+.tag-teal{background:var(--teal-l);color:var(--teal)}
+.tag-amber{background:var(--amber-l);color:var(--amber)}
+.tag-plum{background:var(--plum-l);color:var(--plum)}
+.tag-rust{background:var(--rust-l);color:var(--rust)}
+
+.list-item{display:flex;align-items:flex-start;gap:8px;padding:4px 0;font-size:12.5px;color:var(--ink2);line-height:1.5;border-bottom:1px solid var(--border)}
+.list-item:last-child{border-bottom:none}
+.list-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--ink4);margin-top:7px;flex-shrink:0}
+
+.digest-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;line-height:1.6}
+.digest-item:last-child{border-bottom:none}
+.digest-speaker{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px}
+.digest-speaker.user{color:var(--rust)}
+.digest-speaker.ai{color:var(--teal)}
+.digest-text{color:var(--ink2)}
+
+.handoff-box{border:1.5px solid var(--ink);border-radius:var(--r2);overflow:hidden;margin-top:4px;background:white;box-shadow:var(--shadow2)}
+.handoff-box-head{background:var(--ink);color:var(--sand);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.handoff-box-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.handoff-ready-dot{width:7px;height:7px;border-radius:50%;background:#6ee7b7;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.hb-copy-btn{padding:4px 12px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:var(--sand);font-family:var(--sans);transition:all .13s;letter-spacing:.02em}
+.hb-copy-btn:hover{background:rgba(255,255,255,.2)}
+.hb-copy-btn.ok{background:rgba(110,231,183,.2);border-color:#6ee7b7;color:#6ee7b7}
+.handoff-body{padding:16px;font-family:var(--mono);font-size:12px;color:var(--ink2);line-height:1.8;white-space:pre-wrap;word-break:break-word;max-height:440px;overflow-y:auto;scrollbar-width:thin}
+
+.opts-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;padding:10px 14px;background:var(--sand2);border-radius:var(--r);border:1px solid var(--border)}
+.mode-strip{padding:7px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0;background:var(--sand);flex-wrap:wrap}
+.mode-strip-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--ink4);margin-right:2px;white-space:nowrap}
+.mode-chip{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--ink3);transition:all .13s;font-family:var(--sans);display:inline-flex;align-items:center;gap:4px}
+.mode-chip:hover{border-color:var(--ink3);color:var(--ink2);background:var(--sand2)}
+.mode-chip.on{background:var(--ink);color:var(--sand);border-color:var(--ink)}
+.mode-chip .mode-icon{font-size:10px}
+.mode-desc{font-size:10.5px;color:var(--ink4);font-style:italic;padding:4px 24px 5px;background:var(--sand2);border-bottom:1px solid var(--border);flex-shrink:0;line-height:1.5}
+.arch-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;margin:2px 2px 2px 0;background:var(--teal-l);color:var(--teal);font-family:var(--mono);border:1px solid rgba(45,122,107,.2)}
+.opt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink3);cursor:pointer;user-select:none}
+.opt input{accent-color:var(--rust);cursor:pointer}
+
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0 10px}
+.divider-line{flex:1;height:1px;background:var(--border2)}
+.divider-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4);white-space:nowrap}
+
+.quality-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.quality-label{font-size:11px;color:var(--ink4);min-width:80px}
+.quality-track{flex:1;height:4px;background:var(--sand3);border-radius:2px;overflow:hidden}
+.quality-fill{height:100%;border-radius:2px;transition:width .5s ease}
+
+.ctx-bar-wrap{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:10px 14px;border-radius:var(--r);border:1px solid var(--border2);background:var(--sand2);transition:background .3s,border-color .3s}
+.ctx-bar-wrap.warn{background:#fef9ec;border-color:rgba(168,124,42,.35)}
+.ctx-bar-wrap.danger{background:#fdf2f1;border-color:rgba(176,58,46,.35);animation:ctxpulse 1.8s ease-in-out infinite}
+@keyframes ctxpulse{0%,100%{border-color:rgba(176,58,46,.35)}50%{border-color:rgba(176,58,46,.75)}}
+.ctx-track{flex:1;height:5px;background:var(--sand3);border-radius:3px;overflow:visible;position:relative}
+.ctx-fill{height:100%;border-radius:3px;transition:width .4s ease,background .4s ease}
+.ctx-label{font-size:11px;font-weight:500;white-space:nowrap;transition:color .3s}
+.ctx-ai-name{font-size:10px;color:var(--ink4);white-space:nowrap;letter-spacing:.03em}
+.ctx-warn-btn{font-size:10px;font-weight:600;color:var(--amber);background:var(--amber-l);border:1px solid rgba(168,124,42,.25);border-radius:5px;padding:2px 8px;cursor:pointer;font-family:var(--sans);transition:all .13s;white-space:nowrap}
+.ctx-warn-btn:hover{background:rgba(168,124,42,.2)}
+.ctx-warn-btn.danger-btn{color:var(--red);background:var(--red-l);border-color:rgba(176,58,46,.25)}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:var(--sand);font-size:12.5px;font-weight:500;padding:9px 20px;border-radius:var(--r);opacity:0;pointer-events:none;transition:all .22s ease;z-index:999;box-shadow:var(--shadow2);white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:768px){.layout{grid-template-columns:1fr;height:auto}.pane{height:50vh}.topbar,.pane-head,.pane-foot,.ai-strip{padding-left:16px;padding-right:16px}.pane-body{padding:16px}}
+</style>
 </head>
-
-
 <body>
 
-<canvas id="stars"></canvas>
-
-<div class="moon"></div>
-
-<div class="hub">
-
-<h1 class="title">Inner Worlds</h1>
-<p class="subtitle">Paths to stillness & sleep</p>
-
-<div class="portal-container">
-
-<div class="portal stillness">
-<div class="portal-ring"></div>
-<h2>Stillness</h2>
-<p>Find your calm</p>
+<div class="topbar">
+  <div class="brand">
+    <span class="brand-name">Context Bridge</span>
+    <span class="brand-tag">AI conversation handoff</span>
+  </div>
+  <div class="topbar-right">
+    <span class="pill pill-teal"><span class="pill-dot"></span>Cross-AI</span>
+    <span class="pill pill-rust"><span class="pill-dot"></span>Smart digest</span>
+    <span class="pill pill-plum"><span class="pill-dot"></span>v4.0-gstack</span>
+  </div>
 </div>
 
-<div class="portal sleep">
-<div class="portal-ring"></div>
-<h2>Sleep</h2>
-<p>Drift into rest</p>
+<div class="layout">
+
+  <div class="pane">
+    <div class="pane-head">
+      <span class="pane-label">Input conversation</span>
+      <div class="pane-actions">
+        <button class="btn btn-ghost btn-sm" onclick="doClear()">Clear</button>
+        <button class="btn btn-primary btn-sm" onclick="doProcess()">Build handoff →</button>
+      </div>
+    </div>
+    <div class="ai-strip" id="src-strip">
+      <span class="ai-strip-label">Source</span>
+      <button class="chip on" data-ai="auto" onclick="pickSrc(this)">Auto</button>
+      <button class="chip" data-ai="claude" onclick="pickSrc(this)">Claude</button>
+      <button class="chip" data-ai="chatgpt" onclick="pickSrc(this)">ChatGPT</button>
+      <button class="chip" data-ai="gemini" onclick="pickSrc(this)">Gemini</button>
+      <button class="chip" data-ai="grok" onclick="pickSrc(this)">Grok</button>
+      <button class="chip" data-ai="other" onclick="pickSrc(this)">Other</button>
+    </div>
+    <div style="padding:8px 24px;border-bottom:1px solid var(--border);background:var(--sand2);flex-shrink:0;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <div class="meta-field">
+        <label>Project URL</label>
+        <input class="meta-input" id="meta-url" placeholder="https://yourname.github.io/project" oninput="onMetaChange()" />
+      </div>
+      <div class="meta-field" style="flex:0 0 auto;min-width:140px">
+        <label>Branch</label>
+        <input class="meta-input" id="meta-branch" placeholder="main" style="max-width:120px" oninput="onMetaChange()" />
+      </div>
+    </div>
+    <div class="pane-body">
+      <textarea class="conv-ta" id="raw-input" oninput="onInput()" placeholder="Paste your full conversation here.
+
+Works with Claude, ChatGPT, Gemini, Grok, or any AI chat format.
+
+Select all text from the chat page (Ctrl+A) → copy (Ctrl+C) → paste here.
+
+Context Bridge will extract what matters — what was built, decisions made, files created, what failed and should not be repeated, current blockers, and where you stopped — then generate a complete handoff prompt you can paste into any new AI chat.
+
+Ctrl+Enter to build →"></textarea>
+    </div>
+    <div class="pane-foot">
+      <div class="foot-stat"><div class="live-dot" id="live-dot"></div></div>
+      <div class="foot-stat"><b id="st-words">0</b> words</div>
+      <div class="foot-stat"><b id="st-turns">0</b> turns</div>
+      <div class="foot-stat"><b id="st-chars">0</b> chars</div>
+    </div>
+  </div>
+
+  <div class="pane">
+    <div class="pane-head">
+      <span class="pane-label">Handoff prompt</span>
+      <div class="pane-actions" id="right-actions" style="display:none">
+        <button class="btn btn-ghost btn-sm" id="hdr-copy" onclick="doCopyAll()">Copy all</button>
+      </div>
+    </div>
+    <div class="ai-strip" id="tgt-strip" style="display:none">
+      <span class="ai-strip-label">Target AI</span>
+      <button class="chip on" data-ai="universal" onclick="pickTgt(this)">Universal</button>
+      <button class="chip" data-ai="claude" onclick="pickTgt(this)">Claude</button>
+      <button class="chip" data-ai="chatgpt" onclick="pickTgt(this)">ChatGPT</button>
+      <button class="chip" data-ai="gemini" onclick="pickTgt(this)">Gemini</button>
+      <button class="chip" data-ai="grok" onclick="pickTgt(this)">Grok</button>
+    </div>
+    <div class="mode-strip" id="mode-strip" style="display:none">
+      <span class="mode-strip-label">Mode</span>
+      <button class="mode-chip on" data-mode="resume" onclick="pickMode(this)"><span class="mode-icon">⇢</span>Resume</button>
+      <button class="mode-chip" data-mode="ceo" onclick="pickMode(this)"><span class="mode-icon">✦</span>CEO Review</button>
+      <button class="mode-chip" data-mode="eng" onclick="pickMode(this)"><span class="mode-icon">⚙</span>Eng Review</button>
+      <button class="mode-chip" data-mode="review" onclick="pickMode(this)"><span class="mode-icon">🔎</span>Code Review</button>
+      <button class="mode-chip" data-mode="debug" onclick="pickMode(this)"><span class="mode-icon">⚡</span>Debug</button>
+    </div>
+    <div class="mode-desc" id="mode-desc-bar" style="display:none">⇢ <strong>Resume</strong> — continue the work exactly where it stopped. No preamble, no reintroductions.</div>
+    <div class="pane-body" id="right-body">
+      <div class="empty" id="st-empty">
+        <div class="empty-glyph">⇢</div>
+        <div class="empty-title">No handoff yet</div>
+        <div class="empty-body">Paste a conversation on the left, choose where it came from, and click <em>Build handoff</em>. You'll get a complete context packet to paste into any AI.</div>
+      </div>
+      <div class="processing" id="st-proc" style="display:none">
+        <div class="proc-label" id="proc-lbl">Reading conversation…</div>
+        <div class="proc-track"><div class="proc-bar"></div></div>
+      </div>
+      <div id="st-out" style="display:none"></div>
+    </div>
+    <div id="ctx-window-bar" style="display:none;padding:8px 24px 0;flex-shrink:0">
+      <div class="ctx-bar-wrap" id="ctx-wrap">
+        <span class="ctx-ai-name" id="ctx-ai-name">Claude</span>
+        <div class="ctx-track" style="position:relative">
+          <div class="ctx-fill" id="ctx-fill"></div>
+          <div id="ctx-warn-tick" style="position:absolute;top:-2px;bottom:-2px;width:1.5px;background:rgba(168,124,42,0.5);pointer-events:none"></div>
+        </div>
+        <span class="ctx-label" id="ctx-label">— tk</span>
+        <button class="ctx-warn-btn" id="ctx-lean-btn" style="display:none" onclick="enableLeanMode()">Enable Lean</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:2px 0 4px;font-size:10px;color:var(--ink4)">
+        <span id="ctx-cost" style="font-family:var(--mono)">—</span>
+        <span style="opacity:.6">input cost estimate · not financial advice</span>
+      </div>
+    </div>
+    <div class="pane-foot" id="right-foot" style="display:none">
+      <div class="foot-stat"><b id="out-compress">—</b> compression</div>
+      <div class="foot-stat"><b id="out-tokens">—</b> tokens est.</div>
+      <div class="foot-stat"><b id="out-sections">—</b> sections</div>
+      <div class="foot-stat"><b id="out-quality">—</b> quality</div>
+    </div>
+  </div>
+
 </div>
 
-<div class="portal blog"
-onclick="window.open('https://readandhealmyfrnd.blogspot.com','_blank')">
+<div id="toast"></div>
 
-<div class="portal-ring"></div>
-<h2>Read & Heal</h2>
-<p>Visit the blog</p>
+<script>
+let srcAI='auto', tgtAI='universal', handoffText='', parsedData=null, rawInput='', handoffMode='resume';
 
-</div>
+function pickSrc(el){$$('#src-strip .chip','on');el.classList.add('on');srcAI=el.dataset.ai}
+function pickTgt(el){$$('#tgt-strip .chip','on');el.classList.add('on');tgtAI=el.dataset.ai;if(parsedData)renderAll(parsedData);else updateCtxBar();}
+function pickMode(el){
+  $$('#mode-strip .mode-chip','on');el.classList.add('on');handoffMode=el.dataset.mode;
+  const modeDescBar=document.getElementById('mode-desc-bar');
+  const descs={
+    resume:'⇢ <strong>Resume</strong> — continue the work exactly where it stopped. No preamble, no reintroductions.',
+    ceo:'✦ <strong>CEO Review</strong> — rethink the problem. Find the 10-star product hiding inside the request. (inspired by gstack /plan-ceo-review)',
+    eng:'⚙ <strong>Eng Review</strong> — lock in architecture, data flow, edge cases, failure modes and diagrams before coding. (inspired by gstack /plan-eng-review)',
+    review:'🔎 <strong>Code Review</strong> — paranoid staff engineer mode: find the bugs that pass CI but blow up in production. (inspired by gstack /review)',
+    debug:'⚡ <strong>Debug</strong> — reproduce the failure, identify root cause, propose minimal fix. Do not refactor unrelated code.',
+  };
+  if(modeDescBar)modeDescBar.innerHTML=descs[handoffMode]||descs.resume;
+  if(parsedData)rebuild();
+}
+function $$(sel,cls){document.querySelectorAll(sel).forEach(c=>c.classList.remove(cls))}
 
-</div>
+// ── CONTEXT WINDOW LIMITS + PRICING ──
+// input: usable token budget (full window minus ~4k response buffer)
+// warn/danger: fill % thresholds for colour change
+// inputPer1k: cost per 1k input tokens in USD (as of mid-2025)
+// model: display model name for cost label
+const CTX_LIMITS={
+  universal:{name:'Universal',   model:'(conservative)',input:30000,  warn:0.55,danger:0.80,inputPer1k:0.003 },
+  claude:   {name:'Claude',      model:'Sonnet 4.5',    input:175000, warn:0.50,danger:0.75,inputPer1k:0.003 },
+  chatgpt:  {name:'GPT-4o',      model:'GPT-4o',        input:124000, warn:0.50,danger:0.75,inputPer1k:0.0025},
+  gemini:   {name:'Gemini 2.0',  model:'Gemini 2.0 Pro',input:1000000,warn:0.40,danger:0.65,inputPer1k:0.00125},
+  grok:     {name:'Grok',        model:'Grok-3',        input:131072, warn:0.50,danger:0.75,inputPer1k:0.003 },
+};
+// Claude Sonnet 4.5: 200k context window, ~175k usable (minus response buffer)
+// GPT-4o: 128k context; Gemini 2.0 Pro: 1M context; Grok-3: 131k context
 
-</div>
+function updateCtxBar(){
+  if(!handoffText)return;
+  const tok=Math.round(handoffText.length/4);
+  const limits=CTX_LIMITS[tgtAI]||CTX_LIMITS.universal;
+  const pct=Math.min(tok/limits.input,1);
+  const pctDisplay=Math.round(pct*100);
 
-<script src="js/particles.js"></script>
+  const fill=document.getElementById('ctx-fill');
+  const label=document.getElementById('ctx-label');
+  const wrap=document.getElementById('ctx-wrap');
+  const aiName=document.getElementById('ctx-ai-name');
+  const leanBtn=document.getElementById('ctx-lean-btn');
+  const bar=document.getElementById('ctx-window-bar');
+  const costEl=document.getElementById('ctx-cost');
+  const warnTick=document.getElementById('ctx-warn-tick');
+  if(!fill||!label||!wrap)return;
 
+  bar.style.display='block';
+  aiName.textContent=limits.name;
+
+  // Cost estimate — use unified calculateCost()
+  const costStr=calculateCost(tok,tgtAI);
+  const cfgKey=AI_TO_CONFIG[tgtAI]||'universal';
+  const cfg=CTX_CONFIG[cfgKey]||CTX_CONFIG['universal'];
+  if(costEl)costEl.textContent=costStr+' est. ('+cfg.label+')';
+
+  // Warn tick mark position on track
+  if(warnTick)warnTick.style.left=Math.round(limits.warn*100)+'%';
+
+  // Colour thresholds
+  let fillColor,labelColor,wrapClass='',btnShow=false,btnDanger=false;
+  if(pct>=limits.danger){
+    fillColor='#b03a2e'; labelColor='var(--red)'; wrapClass='danger';
+    btnShow=true; btnDanger=true;
+  } else if(pct>=limits.warn){
+    fillColor='#a87c2a'; labelColor='var(--amber)'; wrapClass='warn';
+    btnShow=true; btnDanger=false;
+  } else {
+    fillColor='#2d7a6b'; labelColor='var(--teal)'; wrapClass='';
+  }
+
+  fill.style.width=pctDisplay+'%';
+  fill.style.background=fillColor;
+  label.style.color=labelColor;
+  // Show absolute tokens + percentage
+  label.textContent=tok.toLocaleString()+' tk ('+pctDisplay+'%)';
+  wrap.className='ctx-bar-wrap'+(wrapClass?' '+wrapClass:'');
+  leanBtn.style.display=btnShow?'':'none';
+  leanBtn.className='ctx-warn-btn'+(btnDanger?' danger-btn':'');
+  leanBtn.textContent=pct>=limits.danger?'⚠ Lean now':'Enable Lean';
+}
+
+function enableLeanMode(){
+  const cb=document.getElementById('opt-lean');
+  if(cb&&!cb.checked){cb.checked=true;rebuild();}
+  toast('Lean mode on — digest removed');
+}
+
+function onInput(){
+  const v=document.getElementById('raw-input').value;
+  const w=v.trim()?v.trim().split(/\s+/).length:0;
+  document.getElementById('st-words').textContent=w.toLocaleString();
+  document.getElementById('st-chars').textContent=v.length.toLocaleString();
+  document.getElementById('st-turns').textContent=countTurns(v);
+  document.getElementById('live-dot').className='live-dot'+(v.trim()?' on':'');
+}
+
+function countTurns(t){
+  const ps=[/^(You|Human|User)\s*[:：]/gim,/^(Claude|Assistant|ChatGPT|Gemini|Grok|AI|Bot)\s*[:：]/gim,/^\*\*(You|Human|User|Claude|Assistant|ChatGPT|Gemini|Grok)\*\*/gim];
+  let mx=0;for(const p of ps){const m=t.match(p);if(m&&m.length>mx)mx=m.length}
+  return mx||Math.max(0,Math.floor(t.split('\n\n').length/2));
+}
+
+function doClear(){
+  document.getElementById('raw-input').value='';
+  onInput();resetRight();
+  // Don't clear meta URL/branch — user likely wants to keep those
+  // but do remove restore banner if visible
+  const banner=document.getElementById('restore-banner');
+  if(banner)banner.remove();
+}
+function resetRight(){show('st-empty');hide('st-proc');hide('st-out');hide('right-actions');hide('tgt-strip');hide('mode-strip');hide('mode-desc-bar');hide('right-foot');const cbar=document.getElementById('ctx-window-bar');if(cbar)cbar.style.display='none';handoffText='';parsedData=null}
+
+// ── PROMPT INJECTION SANITIZER ──
+// Detects and neutralises common injection patterns before the raw text
+// is processed, preventing pasted conversations from hijacking the new AI.
+const INJECTION_PATTERNS=[
+  /ignore\s+(all\s+)?(previous|prior|above)\s+instructions?/i,
+  /disregard\s+(all\s+)?(previous|prior|above)\s+instructions?/i,
+  /forget\s+(everything|all|your\s+instructions?)/i,
+  /you\s+are\s+now\s+(a|an)\s+/i,
+  /act\s+as\s+(a|an)\s+/i,
+  /new\s+system\s+prompt/i,
+  /\[SYSTEM\]/i,
+  /<\/?system>/i,
+  /jailbreak/i,
+  /dan\s+mode/i,
+];
+
+function sanitizeRaw(raw){
+  let cleaned=raw;
+  let injectionCount=0;
+  const flagged=[];
+
+  for(const rx of INJECTION_PATTERNS){
+    const m=cleaned.match(rx);
+    if(m){
+      injectionCount++;
+      flagged.push(m[0].slice(0,60));
+      // Neutralise: replace with neutral marker — do NOT include match text (would reintroduce it)
+      cleaned=cleaned.replace(rx,`[SANITIZED_INJECTION_PATTERN_${injectionCount}]`);
+    }
+  }
+
+  return{cleaned, injectionCount, flagged};
+}
+
+function parseConversation(raw){
+  const lines=raw.split('\n'),turns=[],uP=[/^(You|Human|User)\s*[:：]\s*/i,/^\*\*(You|Human|User)\*\*\s*[:：]?\s*/i,/^👤\s*/],
+    aP=[/^(Claude|Assistant|ChatGPT|GPT|Gemini|Grok|AI|Bot|Copilot|Bard)\s*[:：]\s*/i,/^\*\*(Claude|Assistant|ChatGPT|GPT|Gemini|Grok|AI|Bot)\*\*\s*[:：]?\s*/i,/^🤖\s*/,/^💬\s*/];
+  let spk=null,buf=[];
+  function flush(){if(spk&&buf.length){const c=buf.join('\n').trim();if(c.length>4)turns.push({speaker:spk,content:c})}buf=[]}
+  for(const ln of lines){
+    let hit=false;
+    for(const p of uP){if(p.test(ln)){flush();spk='user';buf.push(ln.replace(p,'').trim());hit=true;break}}
+    if(!hit)for(const p of aP){if(p.test(ln)){flush();spk='ai';buf.push(ln.replace(p,'').trim());hit=true;break}}
+    if(!hit&&spk)buf.push(ln);
+  }
+  flush();
+  if(!turns.length)turns.push({speaker:'context',content:raw.trim()});
+  return turns;
+}
+
+function extractNaming(all){
+  // Variable naming conventions, prefixes, casing styles
+  const ps=[
+    /(?:use|using|follow|always|name(?:d)?|call(?:ed)?|prefix(?:ed)? with|suffix(?:ed)? with)\s+(?:camelCase|snake_case|PascalCase|kebab-case|UPPER_CASE|ALL_CAPS)\s*(.{0,80}?)(?:[.!\n]|$)/gi,
+    /(?:variable|function|class|file|component|method)\s+(?:names?|naming|convention)\s*[:\-]?\s*(.{8,120}?)(?:[.!\n]|$)/gi,
+    /(?:prefix|suffix)\s+(?:all|every|each)?\s*(?:variable|function|class|file|component)s?\s+(?:with|using)\s+(.{4,60}?)(?:[.!\n]|$)/gi,
+    /(?:camelCase|snake_case|PascalCase|kebab-case|UPPER_CASE)\s+(?:for|on|in)\s+(.{5,80}?)(?:[.!\n]|$)/gi,
+    /(?:global|local|private|public)\s+(?:variable|constant|function)s?\s+(?:should|must|are)\s+(.{8,100}?)(?:[.!\n]|$)/gi,
+  ];
+  const out=new Set();
+  for(const p of ps)for(const m of[...all.matchAll(p)]){
+    const c=(m[1]||m[0]).trim().replace(/\n/g,' ');
+    if(c.length>4&&c.length<120)out.add(c);
+  }
+  // Also catch inline examples like: "use `handleXxx` pattern" or "files like `ComponentName.jsx`"
+  const exRx=/`([a-zA-Z_][a-zA-Z0-9_]*(?:Xxx|Name|Id|Type|[A-Z][a-z]+){1,3})`/g;
+  for(const m of[...all.matchAll(exRx)])out.add('Pattern example: '+m[1]);
+  return[...out].slice(0,6);
+}
+
+function extractEnvConstraints(all){
+  // Platform/environment-specific constraints
+  const ps=[
+    /(?:Android|iOS|mobile|tablet|phone|Pydroid|Termux)\s*[:\-]?\s*(.{5,140}?)(?:[.!\n]|$)/gi,
+    /(?:Windows\s*(?:7|XP|10|11)|Linux|Ubuntu|macOS|Chrome(?:book)?)\s*[:\-]?\s*(.{5,120}?)(?:[.!\n]|$)/gi,
+    /(?:screen size|viewport|resolution|max width|min width|responsive|mobile.first)\s*[:\-]?\s*(.{5,100}?)(?:[.!\n]|$)/gi,
+    /(?:no internet|offline|air.gap|local.?only|file:\/\/|without (?:wifi|network|internet))\s*(.{0,80}?)(?:[.!\n]|$)/gi,
+    /(?:memory limit|storage limit|RAM|CPU|low.?end|slow device|battery)\s*[:\-]?\s*(.{5,100}?)(?:[.!\n]|$)/gi,
+    /(?:file permission|read.?only|write.?protect|can'?t (?:install|run|execute))\s*(.{5,100}?)(?:[.!\n]|$)/gi,
+    /(?:browser|Chrome|Firefox|Safari|Edge)\s+(?:only|specific|limitation|doesn'?t support)\s*(.{0,100}?)(?:[.!\n]|$)/gi,
+    /(?:Python\s+\d|Node\s+v?\d|Java\s+\d{1,2}|pip\s+\d)\s+(?:only|required|constraint)\s*(.{0,80}?)(?:[.!\n]|$)/gi,
+  ];
+  const out=new Set();
+  for(const p of ps)for(const m of[...all.matchAll(p)]){
+    const c=(m[1]||m[0]).trim().replace(/\n/g,' ');
+    if(c.length>4&&c.length<150)out.add(c);
+  }
+  return[...out].slice(0,6);
+}
+
+function extract(turns,raw){
+  const uT=turns.filter(t=>t.speaker==='user').map(t=>t.content);
+  const aT=turns.filter(t=>t.speaker==='ai').map(t=>t.content);
+  const allU=uT.join('\n'),allA=aT.join('\n');
+  const allText=allU+' '+allA+' '+raw;
+  return{
+    project:extractProject(uT,aT,raw),
+    tech:extractTech(raw),
+    constraints:extractConstraints(allU||raw,raw),
+    envConstraints:extractEnvConstraints(allText),
+    naming:extractNaming(allText),
+    files:extractFiles(allA,raw),
+    decisions:extractDecisions(allA||raw,raw),
+    failed:extractFailed(allU||raw,allA||raw),
+    blockers:extractBlockers(allU||raw,allA||raw),
+    codeBlocks:extractCode(allA||raw),
+    digest:buildDigest(turns,raw),
+    lastUser:uT[uT.length-1]||(raw.split(/\n\n+/).slice(-2,-1)[0]||''),
+    lastAI:aT[aT.length-1]||(raw.split(/\n\n+/).slice(-1)[0]||''),
+    nextStep:extractNextStep(aT[aT.length-1]||raw.slice(-1500),allA||raw),
+    unresolved:extractUnresolved(allU||raw,raw),
+    branch:extractBranch(allText, document.getElementById('meta-branch')?.value||''),
+    externalLinks:extractExternalLinks(allText),
+    archPatterns:extractArchPatterns(allText),
+    assumptions:extractAssumptions(allText),
+    projectUrl:(document.getElementById('meta-url')?.value||'').trim(),
+    totalTurns:turns.length,userCount:uT.length,aiCount:aT.length,
+    rawLength:raw.length,
+  };
+}
+
+function extractProject(uT,aT,raw){
+  // 1. Try imperative phrases in first 3 user turns
+  const f=uT.slice(0,3).join(' ');
+  const ps=[
+    /(?:build|create|make|write|develop|design|implement|add|generate|set up|setup)\s+(.{10,200}?)(?:[.!?\n]|$)/gi,
+    /(?:I want(?: to)?|I need(?: to)?|I'?m trying to|help me(?: with)?|I'?m building|I'?m working on|working on|can you)\s+(.{10,200}?)(?:[.!?\n]|$)/gi,
+    /(?:let'?s|we('?re| are) (?:building|making|creating|working on))\s+(.{10,200}?)(?:[.!?\n]|$)/gi,
+  ];
+  const cands=[];
+  for(const p of ps)for(const m of[...f.matchAll(p)]){const c=(m[2]||m[1]||'').trim().replace(/\n/g,' ');if(c.length>8)cands.push(c)}
+  if(cands.length)return cands.sort((a,b)=>b.length-a.length)[0].slice(0,300);
+  // 2. Fallback: first non-trivial user message
+  const first=(uT[0]||'').replace(/\n+/g,' ').trim();
+  if(first.length>20)return first.slice(0,300);
+  // 3. Last resort: first 300 chars of raw
+  return raw.replace(/\n+/g,' ').trim().slice(0,300);
+}
+
+function extractTech(text){
+  const terms=[
+    'Python','JavaScript','TypeScript','Java','Go','Rust','Ruby','PHP','Swift','Kotlin','C#','C++','Scala','Perl','R',
+    'React','Vue','Angular','Next.js','Nuxt','Svelte','SvelteKit','Django','Flask','FastAPI','Express','NestJS','Spring','Rails','Laravel','Gin',
+    'PostgreSQL','MySQL','SQLite','MongoDB','Redis','Elasticsearch','Kafka','RabbitMQ','Supabase','Firebase','DynamoDB',
+    'Docker','Kubernetes','AWS','GCP','Azure','Vercel','Netlify','Heroku','Railway','Render','Cloudflare',
+    'Node.js','Deno','Bun','Vite','Webpack','Parcel','esbuild','TailwindCSS','Bootstrap','shadcn','MUI','Chakra',
+    'OpenAI','Anthropic','Claude','Gemini','GPT','LangChain','LlamaIndex','Ollama','Mistral','Groq',
+    'REST','GraphQL','WebSocket','OAuth','JWT','gRPC','tRPC',
+    'Git','GitHub','GitLab','CI/CD','GitHub Actions',
+    'Zerodha','Kite','NSE','BSE','Pydroid','Android','GitHub Pages',
+    'HTML','CSS','SVG','Canvas','WebGL','Three.js','D3','Chart.js',
+    'Pandas','NumPy','Scikit-learn','TensorFlow','PyTorch','Jupyter',
+    'Linux','Ubuntu','Bash','PowerShell','WSL',
+  ];
+  const found=new Set();
+  for(const t of terms){
+    const e=t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    try{if(new RegExp(`\\b${e}\\b`,'i').test(text))found.add(t)}
+    catch{if(text.toLowerCase().includes(t.toLowerCase()))found.add(t)}
+  }
+  return[...found].slice(0,18);
+}
+
+function extractConstraints(u,all){
+  const ps=[
+    /(?:must(?:'nt)?|should(?:n't)? not|cannot|can't|don't|do not|never|always|only use|no (?:external|dependencies|npm|pip|internet|cdn|library|libs|framework))\s+(.{8,140}?)(?:[.!?\n]|$)/gi,
+    /(?:single[- ]?file|self[- ]?contained|standalone|no framework|pure html|vanilla|no (?:build|libs?|npm|node))\s*(.{0,90}?)(?:[.!\n]|$)/gi,
+    /(?:Android|Pydroid|Windows\s*7|offline|without internet|air.?gap)\s*(.{0,80}?)(?:[.!\n]|$)/gi,
+    /(?:constraint|requirement|rule|limitation|restriction|policy)\s*[:\-]\s*(.{10,140}?)(?:[.!\n]|$)/gi,
+    /(?:keep it|keep everything|make it|make sure)\s+(.{8,120}?)(?:[.!?\n]|$)/gi,
+    /(?:do(?:n't| not) use|avoid|skip|without)\s+(.{8,100}?)(?:[.!?\n]|$)/gi,
+  ];
+  const out=new Set();
+  const src=u+(all||'');
+  for(const p of ps)for(const m of[...src.matchAll(p)]){
+    const c=(m[1]||m[0]).trim().replace(/\n/g,' ');
+    if(c.length>8&&c.length<150&&!/^(the|a|an|it|this|that)\b/i.test(c))out.add(c);
+  }
+  return[...out].slice(0,7);
+}
+
+function extractFiles(a,all){
+  const files=new Set();
+  const ps=[
+    /\b[\w][\w\-\.]*\.(?:html|css|js|jsx|mjs|ts|tsx|py|java|cpp|c|h|go|rs|rb|php|json|jsonc|yaml|yml|md|mdx|sql|sh|bash|zsh|env|envrc|ipynb|csv|toml|ini|cfg|conf)\b/gi,
+    /`([^`\s]{2,80}\.(?:html|css|js|jsx|ts|tsx|py|json|yaml|yml|md|sql|sh|txt|env))`/gi,
+    /(?:file|script|component|module|page|route|model|schema|config|template)(?:\s+(?:called|named|as))?\s+[`"']?([\w\-\.\/]{3,70})[`"']?/gi,
+    /(?:in|at|from|to|into)\s+[`"']([\w\-\.\/]{3,70}\.[\w]{1,10})[`"']/gi,
+    /\/(?:src|app|pages|components|api|lib|utils|public|assets|styles|hooks|store|models|routes|views|controllers|services)\/([\w\-\/\.]{3,60})/gi,
+  ];
+  for(const p of ps)for(const m of[...all.matchAll(p)]){
+    const f=(m[1]||m[0]).trim().replace(/^[`"']/,'').replace(/[`"']$/,'');
+    if(f.length>2&&f.length<90&&!f.startsWith('//')&&!f.includes(' ')&&/[a-zA-Z]/.test(f))files.add(f);
+  }
+  return[...files].slice(0,14);
+}
+
+function extractDecisions(a,all){
+  const ps=[
+    /(?:decided?|chose|choosing|let'?s (?:go with|use)|using|will use|we'?ll use|opted? for|going with|best (?:approach|option|way) is|recommend(?:ed|ing)?|suggest(?:ed|ing)?)\s+(.{10,180}?)(?:[.!\n]|$)/gi,
+    /(?:instead of|rather than|not [A-Z]\w+,)\s+(.{10,130}?)(?:[.!\n]|$)/gi,
+    /(?:switched?|changed?|moved?|migrated?) (?:to|from|away from)\s+(.{10,110}?)(?:[.!\n]|$)/gi,
+    /(?:the (?:reason|idea|approach|plan|strategy) is)\s+(.{10,160}?)(?:[.!\n]|$)/gi,
+    /(?:we should|you should|I'?ll|we'?ll)\s+(?:use|go with|stick with|keep)\s+(.{8,140}?)(?:[.!\n]|$)/gi,
+    /(?:this (?:way|approach|method|solution)) (.{8,120}?)(?:[.!\n]|$)/gi,
+  ];
+  const out=[],seen=new Set();
+  for(const p of ps)for(const m of[...all.matchAll(p)]){
+    const d=(m[1]||m[0]).trim().replace(/\n/g,' '),k=d.slice(0,35).toLowerCase();
+    if(d.length>12&&d.length<180&&!seen.has(k)&&!/^(the|a|an|it|this|that|we|I)\s*$/i.test(d)){seen.add(k);out.push(d)}
+  }
+  return out.slice(0,8);
+}
+
+function extractFailed(u,a){
+  const ps=[
+    /(?:doesn'?t work|not working|not (?:working|loading|rendering|running)|failed?|broke?|broken|issue|bug|bugs?|error|errors?|crash(?:ed|ing)?|exception)\s*[:\-]?\s*(.{5,180}?)(?:[.!\n]|$)/gi,
+    /(?:tried?|attempted?|was trying)\s+(.{8,130}?)\s+(?:but|however|though|and it|except|yet|still)\s+(?:it |that )?(?:didn'?t|doesn'?t|won'?t|can'?t|isn'?t|failed?|didn'?t work|broke)/gi,
+    /(?:CORS|blocked|refused|denied|timeout|429|401|403|404|500|502|503|syntax error|type error|reference error|undefined|null)\s*[:\-]?\s*(.{5,130}?)(?:[.!\n]|$)/gi,
+    /(?:getting|got|seeing|see)\s+(?:an? )?(?:error|issue|bug|problem|warning)\s*[:\-]?\s*(.{5,160}?)(?:[.!\n]|$)/gi,
+    /(?:doesn'?t|don'?t|can'?t|won'?t|isn'?t|aren'?t)\s+(.{8,120}?)(?:[.!?\n]|$)/gi,
+    /(?:the (?:error|issue|problem|bug) (?:is|was))\s*[:\-]?\s*(.{8,160}?)(?:[.!\n]|$)/gi,
+  ];
+  const out=new Set();
+  const combined=u+'\n'+a;
+  for(const p of ps)for(const m of[...combined.matchAll(p)]){
+    const f=(m[1]||m[0]).trim().replace(/\n/g,' ');
+    if(f.length>8&&f.length<180&&!/^(the|a|an)\s*$/i.test(f))out.add(f);
+  }
+  return[...out].slice(0,6);
+}
+
+function extractBlockers(u,a){
+  const ps=[
+    /(?:stuck|blocked?|can'?t (?:proceed|figure|get|make)|not sure (?:how|why|what)|don'?t (?:know|understand) how|unclear(?:\s+on)?|confused (?:about|by)|struggling with|having trouble)\s+(.{8,180}?)(?:[.!?\n]|$)/gi,
+    /(?:waiting for|need to figure out|need to find|can'?t find|missing|don'?t have)\s+(.{8,140}?)(?:[.!?\n]|$)/gi,
+    /(?:how (?:do|should|can|would) (?:I|we))\s+(.{8,130}?)\?/gi,
+    /(?:the (?:problem|issue|blocker|challenge) (?:is|was))\s+(.{8,160}?)(?:[.!\n]|$)/gi,
+  ];
+  const out=new Set();
+  for(const p of ps)for(const m of[...(u+'\n'+a).matchAll(p)]){
+    const b=(m[1]||m[0]).trim().replace(/\n/g,' ');
+    if(b.length>8&&b.length<180)out.add(b);
+  }
+  return[...out].slice(0,5);
+}
+
+function extractCode(a){
+  const blocks=[];
+  const rx=/```(\w*)[^\n]*\n([\s\S]*?)```/g;
+  let m;
+  while((m=rx.exec(a))!==null){
+    const lang=m[1]||'code',content=m[2].trim();
+    if(content.length>10)blocks.push({lang,content,lines:content.split('\n').length});
+  }
+  if(!blocks.length){
+    const inlineRx=/`([^`\n]{20,200})`/g;
+    let im;
+    while((im=inlineRx.exec(a))!==null)blocks.push({lang:'code',content:im[1],lines:1});
+  }
+  return blocks.slice(-4); // keep up to 4, smartTrim will compress large ones
+}
+
+// Smart code trimmer — for blocks over TRIM_THRESHOLD lines
+// Instead of raw head-truncation, extracts meaningful structure:
+//   • imports / requires
+//   • function/class/method signatures  
+//   • key comments (// TODO, // IMPORTANT, // NOTE, // FIX)
+//   • first & last N lines for context
+const CODE_TRIM_THRESHOLD=60;  // lines before smart-trim kicks in
+const TRIM_HEAD=20;             // always keep first N lines (imports + setup)
+const TRIM_TAIL=10;             // always keep last N lines (exports + init)
+
+function smartTrimCode(block){
+  const NL='\n';
+  const lines=block.content.split(NL);
+  if(lines.length<=CODE_TRIM_THRESHOLD)return{content:block.content,trimmed:false};
+
+  const lang=(block.lang||'').toLowerCase();
+
+  // ── Structural pass: collect important interior lines ──
+  const interior=new Map(); // idx → line
+
+  // 1. Imports (first 30 lines)
+  const importRx={
+    js:/^\s*(import\s|require\s*\(|export\s)/,
+    py:/^\s*(import\s|from\s+\w+\s+import)/,
+    java:/^\s*(import\s|package\s)/,
+    go:/^\s*(import\s|package\s)/,
+    rs:/^\s*(use\s|extern\s+crate)/,
+    css:/@import/,
+    html:/<(?:script|link|meta|style)/i,
+  };
+  const importPat=importRx[lang]||importRx.js;
+  lines.slice(TRIM_HEAD, lines.length-TRIM_TAIL).forEach((ln,i)=>{
+    const realIdx=i+TRIM_HEAD;
+    if(importPat.test(ln)) interior.set(realIdx,ln);
+  });
+
+  // 2. Function/class signatures in the interior
+  const sigRx=[
+    /^\s*(export\s+)?(default\s+)?(async\s+)?function\s+\w+/,
+    /^\s*(export\s+)?(const|let|var)\s+\w+\s*=\s*(async\s*)?\(/,
+    /^\s*(export\s+)?(abstract\s+)?(class|interface|enum)\s+\w+/,
+    /^\s*def\s+\w+\s*\(/,
+    /^\s*(public|private|protected|static|async).*?\w+\s*\([^)]*\)\s*[:{]/,
+    /^\s*fn\s+\w+\s*[\(<]/,
+    /^\s*func\s+\w+\s*\(/,
+  ];
+  lines.slice(TRIM_HEAD, lines.length-TRIM_TAIL).forEach((ln,i)=>{
+    const realIdx=i+TRIM_HEAD;
+    for(const rx of sigRx){if(rx.test(ln)){interior.set(realIdx,ln);break;}}
+  });
+
+  // 3. Key flagged comments
+  const keyRx=/\/\/\s*(TODO|FIXME|IMPORTANT|NOTE|HACK|WARNING|BUG|CHANGED)/i;
+  const hashRx=/#\s*(TODO|FIXME|IMPORTANT|NOTE|HACK|WARNING|BUG|CHANGED)/i;
+  lines.slice(TRIM_HEAD, lines.length-TRIM_TAIL).forEach((ln,i)=>{
+    const realIdx=i+TRIM_HEAD;
+    if(keyRx.test(ln)||hashRx.test(ln)) interior.set(realIdx,ln);
+  });
+
+  // ── Build output: HEAD + interior (with gaps) + TAIL ──
+  const head=lines.slice(0,TRIM_HEAD);
+  const tail=lines.slice(lines.length-TRIM_TAIL);
+  const interiorIdxs=[...interior.keys()].sort((a,b)=>a-b);
+
+  let mid='';
+  const hiddenStart=TRIM_HEAD;
+  const hiddenEnd=lines.length-TRIM_TAIL-1;
+  const totalHidden=hiddenEnd-hiddenStart+1;
+
+  if(interiorIdxs.length===0){
+    // No extractable structure — just note what was hidden
+    mid=`  // ... [Lines ${hiddenStart+1}–${hiddenEnd+1} hidden — ${totalHidden} lines, no extractable structure]\n`;
+  } else {
+    let last=TRIM_HEAD-1;
+    for(const idx of interiorIdxs){
+      if(idx>last+1){
+        const skipped=idx-last-1;
+        mid+=`  // ... [Lines ${last+2}–${idx} hidden — ${skipped} lines]\n`;
+      }
+      mid+=interior.get(idx)+'\n';
+      last=idx;
+    }
+    if(last<lines.length-TRIM_TAIL-1){
+      const skipped=lines.length-TRIM_TAIL-1-last;
+      mid+=`  // ... [Lines ${last+2}–${lines.length-TRIM_TAIL} hidden — ${skipped} lines]\n`;
+    }
+  }
+
+  const out=head.join('\n')+'\n'+mid+tail.join('\n');
+  const outLines=out.split('\n').length;
+  const savedPct=Math.round((1-outLines/lines.length)*100);
+  return{content:out,trimmed:true,originalLines:lines.length,trimmedLines:outLines,savedPct};
+}
+
+function buildDigest(turns,raw){
+  const all=turns.filter(t=>t.speaker==='user'||t.speaker==='ai');
+
+  // If we have parsed turns, use them
+  if(all.length>=2){
+    const imp=[];
+    const firstU=all.find(t=>t.speaker==='user');
+    if(firstU)imp.push({...firstU,role:'Opening request'});
+    for(const t of all){
+      if(t.speaker==='user'&&t!==firstU&&/\?|fix|change|update|wrong|incorrect|instead|actually|wait|but |no,|hmm|ok so|issue|error|problem/i.test(t.content))
+        imp.push({...t,role:'Correction / pivot'});
+    }
+    // Add every 3rd AI response for substance
+    all.filter(t=>t.speaker==='ai').forEach((t,i)=>{if(i%3===1&&!imp.find(x=>x.content===t.content))imp.push({...t,role:''})});
+    for(const t of all.slice(-4)){if(!imp.find(x=>x.content===t.content))imp.push({...t,role:''})}
+    return imp.slice(0,8).map(t=>({speaker:t.speaker,role:t.role||'',summary:t.content.slice(0,300).replace(/\n+/g,' ')}));
+  }
+
+  // Fallback: chop raw text into pseudo-turns by double newlines
+  const chunks=raw.split(/\n{2,}/).filter(c=>c.trim().length>30).slice(0,10);
+  return chunks.map((c,i)=>({
+    speaker: i%2===0?'user':'ai',
+    role: i===0?'Opening':i===chunks.length-1?'Final exchange':'',
+    summary: c.trim().slice(0,300).replace(/\n+/g,' '),
+  }));
+}
+
+function extractNextStep(lastAI,allAI){
+  // Look in last AI message first, then broader
+  const src=lastAI+'\n'+allAI.slice(-2000);
+  const ps=[
+    /(?:next(?:\s+(?:step|thing|up))?(?:\s+is)?(?:\s+to)?|now\s+(?:you can|we(?:'ll)? can|let'?s)|to (?:complete|finish|wrap up))\s+(.{10,200}?)(?:[.!\n]|$)/gi,
+    /(?:remaining|still (?:need(?:s)?|to do)|todo|to-?do|left to (?:do|add|implement|fix))\s*[:\-]?\s+(.{10,180}?)(?:[.!\n]|$)/gi,
+    /(?:you(?:'ll)? (?:need to|want to|can now|should))\s+(.{10,160}?)(?:[.!\n]|$)/gi,
+    /(?:would you like|shall we|should we|want me to)\s+(.{10,160}?)\??(?:\n|$)/gi,
+  ];
+  for(const p of ps){const m=src.match(p);if(m)return m[0].slice(0,220).replace(/\n/g,' ').trim()}
+  // Fallback: last sentence of last AI message
+  const sentences=lastAI.split(/[.!?]\s+/).filter(s=>s.length>15);
+  return sentences[sentences.length-1]?.slice(0,200)||'';
+}
+
+function extractUnresolved(u,allText){
+  const qs=[];
+  // Questions the user asked
+  for(const ln of u.split('\n')){
+    const t=ln.trim();
+    if(t.includes('?')&&t.length>10&&t.length<200){
+      if(/(?:how|what|where|when|why|which|can|could|would|should|is|are|do|did|will|shall|may|might)/i.test(t))
+        qs.push(t.slice(0,160));
+    }
+  }
+  // Also grab questions ending with "?" from anywhere
+  const anyQ=allText.match(/[A-Z][^.!?]*\?/g)||[];
+  for(const q of anyQ)if(q.length>15&&q.length<160)qs.push(q.trim());
+  return[...new Set(qs)].slice(0,5);
+}
+
+function extractBranch(all, manualBranch){
+  if(manualBranch && manualBranch.trim()) return manualBranch.trim();
+  // Common branch name patterns
+  const ps=[
+    /(?:branch|on|checkout|switch to|working on)\s+[`"']?([\w\-\/\.]{2,40})[`"']?/gi,
+    /(?:git\s+(?:checkout|switch|branch))\s+[`"']?([\w\-\/\.]{2,40})[`"']?/gi,
+    /(main|master|develop|dev|feature\/[\w\-]+|fix\/[\w\-]+|hotfix\/[\w\-]+|release\/[\w\-]+|experimental[\w\-]*|ui[\w\-]*rewrite|v\d[\w\-]*)/gi,
+  ];
+  const found=new Set();
+  for(const p of ps)for(const m of[...all.matchAll(p)]){
+    const b=m[1].trim();
+    if(b.length>1 && b.length<50 && !/^(the|a|an|it|to|on|in)$/i.test(b)) found.add(b);
+  }
+  // Prefer non-main branches as they're more informative
+  const branches=[...found];
+  const interesting=branches.filter(b=>!/^(main|master)$/.test(b));
+  return interesting[0]||branches[0]||'main';
+}
+
+function extractExternalLinks(all){
+  const links=new Set();
+  // CDN / external resource URLs
+  const urlRx=/https?:\/\/(?:cdn\.|unpkg\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|fonts\.googleapis\.com|fonts\.gstatic\.com|api\.|raw\.githubusercontent\.com|storage\.googleapis\.com|[\w\-]+\.github\.io)[^\s"'<>)]+/gi;
+  for(const m of[...all.matchAll(urlRx)]){
+    const u=m[0].replace(/[,;.'">\])}]+$/,'');
+    if(u.length>15 && u.length<300) links.add(u);
+  }
+  // Also grab version-pinned npm/cdn references
+  const cdnNameRx=/(?:cdnjs|jsdelivr|unpkg)\.[^\s"'<>)]+/gi;
+  for(const m of[...all.matchAll(cdnNameRx)]){
+    const u=m[0].replace(/[,;.'">\])}]+$/,'');
+    if(u.length>8) links.add('https://'+u);
+  }
+  return[...links].slice(0,12);
+}
+
+function countTokens(text){
+  // ~1 token per 4 chars (GPT/Claude approximation)
+  return Math.round(text.length/4);
+}
+
+// ── ARCHITECTURE PATTERN EXTRACTOR (gstack /plan-eng-review inspired) ──
+// Detects system design signals from the conversation
+function extractArchPatterns(all){
+  const patterns=new Set();
+  // Common architecture patterns
+  const archRx=[
+    [/\b(?:REST(?:ful)?|API\s+endpoint|CRUD)\b/gi,'REST API'],
+    [/\b(?:WebSocket|real.?time|live\s+update|SSE|server.?sent)\b/gi,'Real-time'],
+    [/\b(?:auth(?:entication)?|OAuth|JWT|session|login|logout|signup)\b/gi,'Auth layer'],
+    [/\b(?:database|DB|schema|migration|SQL|NoSQL|ORM)\b/gi,'Database layer'],
+    [/\b(?:queue|job|worker|async|background|cron|scheduled)\b/gi,'Async jobs'],
+    [/\b(?:cache|caching|Redis|CDN|memoize|stale)\b/gi,'Caching'],
+    [/\b(?:upload|file\s+storage|S3|blob|bucket|multipart)\b/gi,'File storage'],
+    [/\b(?:webhook|event|pub.?sub|listener|emitter|dispatch)\b/gi,'Event system'],
+    [/\b(?:microservice|service\s+boundary|monolith|module)\b/gi,'Service design'],
+    [/\b(?:deploy|CI\/CD|pipeline|build|artifact|Docker|container)\b/gi,'Deploy pipeline'],
+    [/\b(?:test|spec|unit\s+test|integration\s+test|E2E|coverage|mock)\b/gi,'Testing'],
+    [/\b(?:state\s+(?:management|machine)|Redux|Zustand|context|store)\b/gi,'State management'],
+  ];
+  for(const[rx,label]of archRx){if(rx.test(all))patterns.add(label);}
+  return[...patterns];
+}
+
+// ── ASSUMPTION SURFACER (gstack /plan-eng-review paranoid lens) ──
+function extractAssumptions(all){
+  const assumptions=[];
+  const ps=[
+    /(?:assume|assuming|assumption|taken for granted|should work|will work|probably|I think|I guess|might|maybe|perhaps)\s+(.{10,160}?)(?:[.!\n]|$)/gi,
+    /(?:todo|fixme|hack|workaround|temporary|for now|later|eventually|TBD|WIP)\s*[:\-]?\s*(.{5,140}?)(?:[.!\n]|$)/gi,
+    /(?:not sure|unclear|need to check|need to verify|haven'?t tested|haven'?t tried)\s+(.{8,140}?)(?:[.!?\n]|$)/gi,
+  ];
+  const seen=new Set();
+  for(const p of ps)for(const m of[...all.matchAll(p)]){
+    const a=(m[1]||m[0]).trim().replace(/\n/g,' ');
+    const k=a.slice(0,30).toLowerCase();
+    if(a.length>8&&a.length<160&&!seen.has(k)){seen.add(k);assumptions.push(a);}
+  }
+  return assumptions.slice(0,5);
+}
+
+// ── UNIFIED PRICING CONFIG (as suggested) ──
+// Single authoritative source — synced with CTX_LIMITS above
+const CTX_CONFIG={
+  'claude-sonnet-4-5': {limit:200000, warn:160000, pricePerK:0.003,  label:'Claude Sonnet 4.5'},
+  'gpt-4o':            {limit:128000, warn:100000, pricePerK:0.005,  label:'GPT-4o'},
+  'gemini-2-0-pro':    {limit:1000000,warn:800000, pricePerK:0.00125,label:'Gemini 2.0 Pro'},
+  'grok-3':            {limit:131072, warn:100000, pricePerK:0.003,  label:'Grok-3'},
+  'universal':         {limit:32000,  warn:25000,  pricePerK:0.003,  label:'Universal'},
+};
+// AI selector key → CTX_CONFIG key mapping
+const AI_TO_CONFIG={claude:'claude-sonnet-4-5',chatgpt:'gpt-4o',gemini:'gemini-2-0-pro',grok:'grok-3',universal:'universal'};
+
+function calculateCost(tokens, aiKey){
+  const cfgKey=AI_TO_CONFIG[aiKey]||'universal';
+  const cfg=CTX_CONFIG[cfgKey]||CTX_CONFIG['universal'];
+  const cost=(tokens/1000)*cfg.pricePerK;
+  // Return formatted: $0.0056
+  if(cost<0.00005) return '<$0.0001';
+  if(cost<0.01)    return '$'+cost.toFixed(4);
+  return '$'+cost.toFixed(3);
+}
+
+function buildHandoff(s,tgt,src,rawWords,_modeOverride){
+  // ── MODE PREAMBLES (gstack-inspired cognitive modes) ──
+  // Each mode tells the AI *what kind of brain to use*, not just what to do.
+  const modePreambles={
+    resume:{
+      universal:`[CONTEXT HANDOFF] Resuming an interrupted AI conversation.
+Load the structured context below completely before responding.
+Do not greet me. Do not summarise back. Continue the work directly.`,
+      claude:`<context_handoff>
+You are resuming a project that was interrupted when the previous session hit its context limit.
+Read all sections carefully, confirm the project state in one sentence, then continue coding immediately.
+</context_handoff>`,
+      chatgpt:`SYSTEM: Resume state. You are continuing an interrupted coding session.
+Parse all sections. Do not re-introduce yourself. Output code or next action directly.`,
+      gemini:`[HANDOFF PACKET — Gemini]
+Previous session interrupted. Read all sections, infer current state, then continue without preamble.`,
+      grok:`[RESUME] Picking up an interrupted session. Full context below — get up to speed, jump straight back in.`,
+    },
+    ceo:{
+      universal:`[CEO REVIEW MODE — inspired by gstack /plan-ceo-review]
+You are now in founder mode. Think with taste, ambition, and user empathy.
+Do NOT take the request literally. Ask the more important question first: what is this product ACTUALLY for?
+Find the 10-star version hiding inside the request. Ask: what would make this feel inevitable, delightful, maybe magical?
+After reading the context below, rethink the problem from the user's POV. Challenge every assumption.
+Then present the 10-star vision before discussing implementation.`,
+      claude:`<ceo_review_mode>
+You are now thinking like a world-class product founder with exceptional taste.
+Read the project context below. Do NOT implement the obvious request.
+Instead: (1) identify what the product is ACTUALLY for from the user's point of view
+(2) imagine what the 10-star version looks like — the one that feels inevitable
+(3) present that vision first, then offer to plan implementation.
+Think Brian Chesky at Airbnb: "What would a 10-star experience look like?"
+</ceo_review_mode>`,
+      chatgpt:`SYSTEM: CEO/Founder review mode. Read the project context.
+Do not implement the request as stated. First identify what the user ACTUALLY needs.
+Then describe the 10-star product vision. Only then discuss how to build it.`,
+      gemini:`[CEO REVIEW] Read the context. Challenge assumptions. Find the 10-star product hidden in this request. Present vision first.`,
+      grok:`[CEO MODE] Don't build what they asked. Build what they need. Find the 10-star version first.`,
+    },
+    eng:{
+      universal:`[ENG REVIEW MODE — inspired by gstack /plan-eng-review]
+You are now an engineering manager and senior tech lead.
+The product direction is already decided. Your job: make the idea BUILDABLE.
+Read the context below, then produce:
+• Architecture diagram (components, data flow, system boundaries)
+• State transitions and async boundaries
+• Failure modes and edge cases
+• Trust boundaries and security surface
+• Test coverage plan
+• Any unstated assumptions that need resolving before coding begins
+Draw the system. Diagrams force hidden assumptions into the open.`,
+      claude:`<eng_review_mode>
+You are now acting as a senior engineering manager. The product vision is set.
+After reading the context, produce a complete technical plan:
+(1) Architecture: components, boundaries, data flow — use ASCII or Mermaid diagrams
+(2) State model: what transitions exist, what gets persisted, what can be recomputed
+(3) Failure modes: what happens when each step fails
+(4) Trust boundaries: where is data validated, where are security surfaces
+(5) Test matrix: unit, integration, E2E coverage needed
+(6) Open assumptions: what must be decided before coding
+Make the idea buildable. Not smaller — buildable.
+</eng_review_mode>`,
+      chatgpt:`SYSTEM: Engineering review mode. Read context. Produce architecture diagram, state model, failure modes, trust boundaries, and test plan. Make the idea buildable.`,
+      gemini:`[ENG REVIEW] Architecture, data flow, failure modes, trust boundaries, test plan. Draw the system. Make it buildable.`,
+      grok:`[ENG MODE] Read context. Output: arch diagram, state model, failure modes, security surface, test plan.`,
+    },
+    review:{
+      universal:`[CODE REVIEW MODE — inspired by gstack /review]
+You are now a paranoid senior staff engineer. Passing tests ≠ safe branch.
+Read the context below. Do NOT give compliments or style feedback.
+Look for:
+• Race conditions and concurrency bugs
+• N+1 queries and stale reads
+• Trust boundary violations (client data treated as trusted)
+• Missing indexes and performance traps
+• Retry logic flaws and idempotency bugs
+• Tests that pass while missing the real failure mode
+• Prompt injection or data-exfiltration vectors
+• Orphaned resources (failed uploads, dangling jobs)
+Triage each finding: CRITICAL / HIGH / MEDIUM. Imagine the production incident before it happens.`,
+      claude:`<code_review_mode>
+You are a paranoid senior staff engineer reviewing this codebase.
+Passing tests and green CI do not mean this is safe to ship.
+After reading the context:
+(1) List CRITICAL issues: things that will cause data loss, security breach, or production outage
+(2) List HIGH issues: race conditions, N+1 queries, broken invariants, missing validation
+(3) List MEDIUM issues: performance traps, retry logic gaps, orphaned resources
+(4) Note any tests that pass but miss the real failure mode
+Do not give style feedback. Do not give compliments. Find the production incident before it happens.
+</code_review_mode>`,
+      chatgpt:`SYSTEM: Code review mode. Paranoid staff engineer. Find: race conditions, N+1 queries, trust boundary violations, missing indexes, retry flaws, injection vectors. CRITICAL/HIGH/MEDIUM triage only.`,
+      gemini:`[CODE REVIEW] Paranoid review. Race conditions, security, performance, broken invariants. No style feedback. CRITICAL/HIGH/MEDIUM only.`,
+      grok:`[REVIEW MODE] Find the bugs that pass CI but blow up in prod. Race conditions, trust violations, N+1s, injection vectors. Triage only.`,
+    },
+    debug:{
+      universal:`[DEBUG MODE]
+You are a methodical debugger. Read the context and error information below.
+Your approach:
+(1) REPRODUCE: identify the exact conditions that trigger the failure
+(2) ISOLATE: narrow the root cause to the minimal failing case
+(3) EXPLAIN: describe WHY this fails, not just WHAT fails
+(4) FIX: propose the minimal change that fixes the root cause
+(5) VERIFY: describe how to confirm the fix works
+Do NOT refactor unrelated code. Do NOT change anything outside the failure scope.
+Fix the bug, nothing more.`,
+      claude:`<debug_mode>
+You are debugging a specific failure. Read the context and error details.
+(1) Reproduce: what exact conditions trigger this?
+(2) Isolate: what is the minimal failing case?
+(3) Root cause: WHY does this fail — not just what fails
+(4) Minimal fix: smallest change that resolves the root cause
+(5) Verification: how do we confirm it is fixed?
+Do not refactor. Do not improve unrelated things. Fix the bug.
+</debug_mode>`,
+      chatgpt:`SYSTEM: Debug mode. Reproduce failure, isolate root cause, explain WHY, propose minimal fix, describe verification. Do not refactor unrelated code.`,
+      gemini:`[DEBUG] Reproduce → isolate → explain WHY → minimal fix → verify. No unrelated changes.`,
+      grok:`[DEBUG MODE] Root cause only. Minimal fix. No unrelated refactoring.`,
+    },
+  };
+
+  const mode=_modeOverride||handoffMode||'resume';
+  const modeGreets=modePreambles[mode]||modePreambles.resume;
+  const greet=modeGreets; // mode-aware greet object keyed by target AI
+
+  const srcLabel=src==='auto'?'AI':src.charAt(0).toUpperCase()+src.slice(1);
+  const inclCode=document.getElementById('opt-code')?.checked!==false;
+  const inclConfirm=document.getElementById('opt-confirm')?.checked!==false;
+  const useLean=document.getElementById('opt-lean')?.checked===true;
+  const sep=useLean?'---':'---';  // always use --- (token-efficient vs ════)
+  let p='';
+  let secN=1;
+  const sec=(title)=>`\n### ${secN++}. ${title}\n`;
+
+  p+=`${greet[tgt]||greet.universal}\n`;
+  p+=`${sep}\n`;
+  const branch=s.branch||'main';
+  const projUrl=s.projectUrl||'';
+  const modeLabel=mode.toUpperCase();
+  p+=`meta: source=${srcLabel} | turns=${s.totalTurns} | src_words=${rawWords.toLocaleString()} | branch=${branch} | mode=${modeLabel}\n`;
+  if(projUrl) p+=`project_url: ${projUrl}\n`;
+  p+=`${sep}\n`;
+
+  // 1. Project
+  p+=sec('PROJECT');
+  p+=`${s.project||'(see conversation below)'}\n`;
+
+  // 2. Tech stack — key:value for AI efficiency
+  if(s.tech.length){
+    p+=sec('TECH STACK');
+    p+=`tech: ${s.tech.join(', ')}\n`;
+  }
+
+  // 3. Global rules / naming conventions (NEW)
+  const allRules=[...s.constraints,...(s.naming||[])];
+  if(allRules.length){
+    p+=sec('GLOBAL RULES & NAMING CONVENTIONS');
+    for(const r of allRules)p+=`- ${r}\n`;
+  }
+
+  // 4. Environment constraints (NEW)
+  if(s.envConstraints&&s.envConstraints.length){
+    p+=sec('ENVIRONMENT CONSTRAINTS');
+    for(const e of s.envConstraints)p+=`- ${e}\n`;
+  }
+
+  // 5. Project manifest — do not recreate these (NEW)
+  if(s.files.length){
+    p+=sec('PROJECT MANIFEST (files already exist — do not recreate)');
+    for(const f of s.files)p+=`- ${f}\n`;
+  }
+
+  // 5b. External resources (CDN links, fonts, APIs)
+  if(s.externalLinks&&s.externalLinks.length){
+    p+=sec('EXTERNAL RESOURCES (CDN / API links — use these exact versions)');
+    for(const l of s.externalLinks)p+=`- ${l}\n`;
+  }
+
+  // 6. Architecture patterns detected (gstack eng-review signal)
+  if(s.archPatterns&&s.archPatterns.length){
+    p+=sec('ARCHITECTURE SIGNALS (detected system patterns)');
+    p+=`patterns: ${s.archPatterns.join(', ')}\n`;
+  }
+
+  // 7. Decisions
+  if(s.decisions.length){
+    p+=sec('DECISIONS MADE');
+    for(const d of s.decisions)p+=`- ${d}\n`;
+  }
+
+  // 8. Tried & failed
+  if(s.failed.length){
+    p+=sec('TRIED & FAILED — do not repeat');
+    for(const f of s.failed)p+=`✗ ${f}\n`;
+  }
+
+  // 9. Blockers
+  if(s.blockers.length){
+    p+=sec('CURRENT BLOCKERS');
+    for(const b of s.blockers)p+=`? ${b}\n`;
+  }
+
+  // 10. Unstated assumptions (gstack paranoid review lens) — eng/review/debug modes
+  if(!useLean&&s.assumptions&&s.assumptions.length&&['eng','review','debug'].includes(mode)){
+    p+=sec('UNSTATED ASSUMPTIONS (verify before proceeding)');
+    for(const a of s.assumptions)p+=`~ ${a}\n`;
+  }
+
+  // 11. Unresolved — skipped in lean mode
+  if(!useLean&&s.unresolved.length){
+    p+=sec('OPEN QUESTIONS');
+    for(const q of s.unresolved)p+=`- ${q}\n`;
+  }
+
+  // 12. Code — smart-trimmed for large blocks
+  if(inclCode&&s.codeBlocks.length){
+    p+=sec('LATEST CODE');
+    for(const b of s.codeBlocks){
+      const trimmed=smartTrimCode(b);
+      const note=trimmed.trimmed?` [auto-trimmed ${trimmed.originalLines}→${trimmed.content.split('\n').length} lines, saved ${trimmed.savedPct}%]`:'';
+      p+=`\`\`\`${b.lang}${note}\n${trimmed.content}\n\`\`\`\n`;
+    }
+  }
+
+  // 13. Digest — skipped in lean mode
+  if(!useLean&&s.digest.length){
+    p+=sec('CONVERSATION DIGEST');
+    for(const d of s.digest){
+      const who=d.speaker==='user'?'U':'A',role=d.role?` [${d.role}]`:'';
+      p+=`${who}${role}: ${d.summary}${d.summary.length>=300?'…':''}\n`;
+    }
+  }
+
+  // 14. Last exchange
+  p+=sec('WHERE WE LEFT OFF');
+  if(s.lastUser)p+=`U: ${s.lastUser.slice(0,500)}${s.lastUser.length>500?'…':''}\n`;
+  if(s.lastAI)p+=`A: ${s.lastAI.slice(0,900)}${s.lastAI.length>900?'…':''}\n`;
+  if(s.nextStep){p+=sec('NEXT STEP');p+=`${s.nextStep}\n`;}
+
+  // Token budget footer — counted after p is fully built
+  p+=`\n${sep}\n`;
+  const tokenEst=countTokens(p);
+  p+=`handoff_tokens: ~${tokenEst.toLocaleString()} | budget: ${tokenEst<2000?'lean':tokenEst<6000?'moderate':'heavy'}\n`;
+  p+=`${sep}\n`;
+
+  // Resume instruction (mode-aware)
+  const modeActions={
+    resume:`[ACTION: RESUME_MODE_ON]\nConfirm in one line: (a) task (b) state (c) next action. Then continue — no preamble.\n`,
+    ceo:`[ACTION: CEO_REVIEW_MODE]\nChallenge the problem framing. Present the 10-star vision. Then ask if I want to proceed with that or the original plan.\n`,
+    eng:`[ACTION: ENG_REVIEW_MODE]\nProduce the technical plan with diagrams before writing any code. Ask for missing information before making architecture decisions.\n`,
+    review:`[ACTION: CODE_REVIEW_MODE]\nList findings as CRITICAL / HIGH / MEDIUM. No compliments. No style notes. Production-incident mindset only.\n`,
+    debug:`[ACTION: DEBUG_MODE]\nReproduce → isolate → root cause → minimal fix → verification. Do not touch code outside the failure scope.\n`,
+  };
+  if(inclConfirm){
+    p+=modeActions[mode]||modeActions.resume;
+  }else{
+    p+=`[ACTION: ${mode.toUpperCase()}_MODE_ON] Continue the work.\n`;
+  }
+
+  return p.trim();
+}
+
+function calcQuality(s){
+  let q=40;
+  if(s.tech.length>=1)              q+=7;
+  if(s.tech.length>=4)              q+=3;
+  if(s.constraints.length>=1)       q+=5;
+  if(s.envConstraints&&s.envConstraints.length>=1) q+=5;
+  if(s.naming&&s.naming.length>=1)  q+=5;
+  if(s.files.length>=1)             q+=7;
+  if(s.files.length>=3)             q+=3;   // manifest bonus
+  if(s.decisions.length>=1)         q+=7;
+  if(s.decisions.length>=3)         q+=3;
+  if(s.failed.length>=1)            q+=10;  // most valuable
+  if(s.codeBlocks.length>=1)        q+=8;
+  if(s.digest.length>=2)            q+=5;
+  if(s.digest.length>=5)            q+=3;
+  if(s.nextStep)                    q+=4;
+  if(s.unresolved.length>=1)        q+=3;
+  if(s.blockers.length>=1)          q+=4;
+  if(s.externalLinks&&s.externalLinks.length>=1) q+=4;
+  if(s.archPatterns&&s.archPatterns.length>=2)   q+=3;  // architecture signal bonus
+  if(s.assumptions&&s.assumptions.length>=1)     q+=2;  // surfaced assumptions bonus
+  if(s.branch&&s.branch!=='main') q+=3;
+  if(s.projectUrl) q+=3;
+  if(s.totalTurns<=1&&s.rawLength<400) q=Math.min(q,58);
+  return Math.min(Math.round(q),100);
+}
+
+function renderAll(s){
+  // Clear stale section copy keys from previous render
+  Object.keys(sectionCopyMap).forEach(k=>delete sectionCopyMap[k]);
+  const rw=rawInput.trim().split(/\s+/).length;
+  const h=buildHandoff(s,tgtAI,srcAI,rw,handoffMode);
+  handoffText=h;
+  const hw=h.split(/\s+/).length;
+  const comp=Math.max(0,Math.round((1-hw/rw)*100));
+  const q=calcQuality(s);
+  const secs=[s.project,s.tech.length,s.constraints.length,(s.envConstraints||[]).length,(s.naming||[]).length,s.files.length,(s.externalLinks||[]).length,s.decisions.length,s.failed.length,s.blockers.length,s.codeBlocks.length].filter(Boolean).length;
+
+  document.getElementById('out-compress').textContent=comp+'%';
+  const tokenEst=Math.round(h.length/4);
+  const budgetLabel=tokenEst<2000?'lean':tokenEst<6000?'moderate':'heavy';
+  document.getElementById('out-tokens').textContent='~'+tokenEst.toLocaleString()+' ('+budgetLabel+')';
+  updateCtxBar();
+  document.getElementById('out-sections').textContent=secs;
+  document.getElementById('out-quality').textContent=q+'%';
+
+  const modeLabels={resume:'⇢ Resume',ceo:'✦ CEO Review',eng:'⚙ Eng Review',review:'🔎 Code Review',debug:'⚡ Debug'};
+  const modeBadgeColor={resume:'var(--teal)',ceo:'var(--amber)',eng:'var(--plum)',review:'var(--red)',debug:'var(--rust)'};
+  const modeBadgeBg={resume:'var(--teal-l)',ceo:'var(--amber-l)',eng:'var(--plum-l)',review:'var(--red-l)',debug:'var(--rust-l)'};
+  const curMode=handoffMode||'resume';
+  const qc=q>=80?'#2d7a6b':q>=50?'#a87c2a':'#c4622d';
+  let html=`<div class="opts-row">
+    <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:600;background:${modeBadgeBg[curMode]};color:${modeBadgeColor[curMode]};border:1px solid ${modeBadgeColor[curMode]}33">${modeLabels[curMode]||'⇢ Resume'}</span>
+    <label class="opt"><input type="checkbox" id="opt-code" checked onchange="rebuild()"> Include code</label>
+    <label class="opt"><input type="checkbox" id="opt-confirm" checked onchange="rebuild()"> Ask AI to confirm</label>
+    <label class="opt" title="Removes digest &amp; open questions to save ~30% tokens"><input type="checkbox" id="opt-lean" onchange="rebuild()"> Lean mode <span style="color:var(--ink4);font-size:10px">(strips digest)</span></label>
+  </div>
+  <div class="quality-bar-wrap">
+    <span class="quality-label">Handoff quality</span>
+    <div class="quality-track"><div class="quality-fill" style="width:${q}%;background:${qc}"></div></div>
+    <span style="font-size:11px;color:${qc};font-weight:600;min-width:30px;text-align:right">${q}%</span>
+  </div>`;
+
+  if(s.project) html+=card('🎯','Task identified','#2d7a6b',`<div style="font-size:13px;color:var(--ink2);line-height:1.6">${esc(s.project.slice(0,280))}</div>`,s.project.slice(0,280));
+  if(s.tech.length) html+=card('⚙️','Tech stack','#5e3d7a',s.tech.map(t=>`<span class="tag tag-plum">${esc(t)}</span>`).join(''),`tech: ${s.tech.join(', ')}`);
+
+  // Architecture signals card (gstack eng-review signal)
+  if(s.archPatterns&&s.archPatterns.length)
+    html+=card('🏗','Architecture signals','#2d7a6b',
+      `<div style="font-size:11px;color:var(--ink4);margin-bottom:6px;font-style:italic">Detected system patterns — useful for Eng Review mode</div>`+
+      s.archPatterns.map(p=>`<span class="arch-tag">${esc(p)}</span>`).join(''),
+      `patterns: ${s.archPatterns.join(', ')}`);
+
+  const allRulesUI=[...s.constraints,...(s.naming||[])];
+  if(allRulesUI.length) html+=card('📐','Global rules & naming','#b03a2e',allRulesUI.map(c=>`<div class="list-item" style="color:var(--red)">${esc(c)}</div>`).join(''),allRulesUI.map(r=>`- ${r}`).join('\n'));
+  if(s.envConstraints&&s.envConstraints.length) html+=card('📱','Environment constraints','#5e3d7a',s.envConstraints.map(e=>`<div class="list-item">${esc(e)}</div>`).join(''),s.envConstraints.map(e=>`- ${e}`).join('\n'));
+  if(s.files.length) html+=card('📄','Project manifest','#a87c2a',
+    `<div style="font-size:11px;color:var(--ink4);margin-bottom:6px;font-style:italic">These files exist — AI will not recreate them.</div>`+
+    s.files.map(f=>`<div class="list-item"><code style="font-family:var(--mono);font-size:11.5px">${esc(f)}</code></div>`).join(''),
+    s.files.map(f=>`- ${f}`).join('\n'));
+  if(s.decisions.length) html+=card('↗','Decisions made','#2d7a6b',s.decisions.map(d=>`<div class="list-item">${esc(d)}</div>`).join(''),s.decisions.map(d=>`- ${d}`).join('\n'));
+
+  if(s.failed.length) html+=card('✗','Tried & failed — AI will avoid these','#b03a2e',
+    `<div style="font-size:11px;color:var(--ink4);margin-bottom:6px;font-style:italic">The receiving AI will not repeat these approaches.</div>`+
+    s.failed.map(f=>`<div class="list-item" style="color:var(--red)">${esc(f)}</div>`).join(''),
+    s.failed.map(f=>`✗ ${f}`).join('\n'));
+
+  if(s.blockers.length) html+=card('⚠️','Current blockers','#a87c2a',s.blockers.map(b=>`<div class="list-item">${esc(b)}</div>`).join(''),s.blockers.map(b=>`? ${b}`).join('\n'));
+
+  // Unstated assumptions card (gstack paranoid review lens)
+  if(s.assumptions&&s.assumptions.length)
+    html+=card('~','Unstated assumptions','#a87c2a',
+      `<div style="font-size:11px;color:var(--ink4);margin-bottom:6px;font-style:italic">Surface these in Eng Review or Code Review mode</div>`+
+      s.assumptions.map(a=>`<div class="list-item">${esc(a)}</div>`).join(''),
+      s.assumptions.map(a=>`~ ${a}`).join('\n'));
+
+  if(s.digest.length) html+=card('📋','Conversation digest','#5e3d7a',
+    s.digest.map(d=>{
+      const who=d.speaker==='user'?'user':'ai',role=d.role?` · <em>${esc(d.role)}</em>`:'';
+      return`<div class="digest-item"><div class="digest-speaker ${who}">${d.speaker.toUpperCase()}${role}</div><div class="digest-text">${esc(d.summary)}${d.summary.length>=300?'…':''}</div></div>`;
+    }).join(''),
+    s.digest.map(d=>{const who=d.speaker==='user'?'U':'A',role=d.role?` [${d.role}]`:'';return`${who}${role}: ${d.summary}`}).join('\n'));
+
+  if(s.externalLinks&&s.externalLinks.length)
+    html+=card('🔗','External resources','#2d7a6b',
+      s.externalLinks.map(l=>`<div class="list-item"><a href="${esc(l)}" target="_blank" style="font-family:var(--mono);font-size:11px;color:var(--teal);word-break:break-all">${esc(l)}</a></div>`).join(''),
+      s.externalLinks.map(l=>`- ${l}`).join('\n'));
+
+  if(s.codeBlocks&&s.codeBlocks.length){
+    const trimStats=s.codeBlocks.map(b=>smartTrimCode(b));
+    const anyTrimmed=trimStats.some(t=>t.trimmed);
+    const codeHtml=trimStats.map((t,i)=>{
+      const b=s.codeBlocks[i];
+      const tag=t.trimmed
+        ?`<span style="font-size:10px;padding:1px 6px;border-radius:3px;background:var(--teal-l);color:var(--teal);font-family:var(--mono);margin-left:4px">✂ ${t.originalLines}→${t.content.split('\n').length} lines</span>`
+        :`<span style="font-size:10px;padding:1px 6px;border-radius:3px;background:var(--sand3);color:var(--ink4);font-family:var(--mono);margin-left:4px">${b.lines} lines</span>`;
+      return`<div class="list-item"><code style="font-family:var(--mono);font-size:11px">${esc(b.lang||'code')}</code>${tag}</div>`;
+    }).join('');
+    const trimNote=anyTrimmed?'Structure extracted — imports, signatures, key comments':'Full blocks included';
+    html+=card('💻','Code blocks','#2d7a6b',
+      `<div style="font-size:11px;color:var(--ink4);margin-bottom:6px;font-style:italic">${trimNote}</div>`+codeHtml,
+      trimStats.map(t=>t.content).join('\n---\n'));
+  }
+
+  const _histCard=renderHistoryCard(s);
+  if(_histCard) html+=_histCard;
+
+  const branchBadge=`<span class="branch-badge">&#x2387; ${esc(s.branch||'main')}</span>`;
+  const urlBadge=s.projectUrl?`<a href="${esc(s.projectUrl)}" target="_blank" class="url-badge" title="${esc(s.projectUrl)}">&#x1F310; ${esc(s.projectUrl.replace(/https?:\/\//,'').slice(0,36))}${s.projectUrl.length>40?'&hellip;':''}</a>`:'';
+  if(s.branch||s.projectUrl)
+    html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center">${branchBadge}${urlBadge}</div>`;
+
+  html+=`<div class="divider"><div class="divider-line"></div><div class="divider-label">Final handoff prompt</div><div class="divider-line"></div></div>
+  <div class="handoff-box">
+    <div class="handoff-box-head">
+      <div class="handoff-box-label"><div class="handoff-ready-dot"></div>Ready to paste into any AI</div>
+      <button class="hb-copy-btn" id="hb-copy" onclick="doCopyAll()">Copy prompt</button>
+    </div>
+    <div class="handoff-body" id="handoff-text">${esc(h)}</div>
+  </div>`;
+
+  const out=document.getElementById('st-out');
+  out.innerHTML=html;
+  show('st-out');hide('st-proc');show('right-actions');show('tgt-strip');show('mode-strip');show('mode-desc-bar');show('right-foot');
+}
+
+// sectionCopyMap: maps copyId -> text, avoids inline JSON in onclick attrs
+const sectionCopyMap={};
+
+function card(icon,label,color,content,copyText){
+  let copyBtn='';
+  if(copyText){
+    const copyId='cp-'+Math.random().toString(36).slice(2,8);
+    sectionCopyMap[copyId]=copyText;
+    copyBtn=`<button class="scard-copy" data-cpid="${copyId}" onclick="copySection(this)">Copy</button>`;
+  }
+  return`<div class="scard"><div class="scard-head"><div class="scard-label"><div class="scard-dot" style="background:${color}25;outline:1.5px solid ${color}50;box-sizing:border-box"></div>${icon} ${label}</div>${copyBtn}</div><div class="scard-body">${content}</div></div>`;
+}
+
+function copySection(btn){
+  const id=btn.dataset.cpid;
+  const text=sectionCopyMap[id]||'';
+  if(!text)return;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent='✓';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok')},1800);
+    toast('Section copied');
+  }).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    btn.textContent='✓';setTimeout(()=>btn.textContent='Copy',1800);toast('Section copied');
+  });
+}
+
+function rebuild(){
+  if(!parsedData)return;
+  const rw=rawInput.trim().split(/\s+/).length;
+  const h=buildHandoff(parsedData,tgtAI,srcAI,rw,handoffMode);
+  handoffText=h;
+  const el=document.getElementById('handoff-text');
+  if(el)el.textContent=h;
+  const rTok=Math.round(h.length/4);
+  const rBudget=rTok<2000?'lean':rTok<6000?'moderate':'heavy';
+  document.getElementById('out-tokens').textContent='~'+rTok.toLocaleString()+' ('+rBudget+')';
+  updateCtxBar();
+  // Also refresh quality + compression
+  const q=calcQuality(parsedData);
+  const qc=q>=80?'#2d7a6b':q>=50?'#a87c2a':'#c4622d';
+  document.getElementById('out-quality').textContent=q+'%';
+  const qFill=document.querySelector('.quality-fill');
+  if(qFill){qFill.style.width=q+'%';qFill.style.background=qc;}
+  const qScore=document.querySelector('.quality-score');
+  if(qScore){qScore.textContent=q+'%';qScore.style.color=qc;}
+  const rw2=rawInput.trim().split(/\s+/).length;
+  const hw2=h.split(/\s+/).length;
+  document.getElementById('out-compress').textContent=Math.max(0,Math.round((1-hw2/rw2)*100))+'%';
+  // Update mode badge in opts-row
+  const modeLabels={resume:'⇢ Resume',ceo:'✦ CEO Review',eng:'⚙ Eng Review',review:'🔎 Code Review',debug:'⚡ Debug'};
+  const modeBadgeColor={resume:'var(--teal)',ceo:'var(--amber)',eng:'var(--plum)',review:'var(--red)',debug:'var(--rust)'};
+  const modeBadgeBg={resume:'var(--teal-l)',ceo:'var(--amber-l)',eng:'var(--plum-l)',review:'var(--red-l)',debug:'var(--rust-l)'};
+  const curMode=handoffMode||'resume';
+  const badge=document.querySelector('.opts-row span[style*="border-radius:20px"]');
+  if(badge){
+    badge.textContent=modeLabels[curMode]||'⇢ Resume';
+    badge.style.background=modeBadgeBg[curMode];
+    badge.style.color=modeBadgeColor[curMode];
+    badge.style.borderColor=modeBadgeColor[curMode].replace(')',',0.2)').replace('var(--','rgba(').replace(')','');
+    // simpler: just update the whole style string
+    badge.setAttribute('style',`display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:600;background:${modeBadgeBg[curMode]};color:${modeBadgeColor[curMode]};border:1px solid ${modeBadgeColor[curMode]}33`);
+  }
+  saveToStorage();
+}
+
+async function doProcess(){
+  const raw=document.getElementById('raw-input').value.trim();
+  if(!raw){toast('Paste a conversation first');return}
+  rawInput=raw;
+  hide('st-empty');hide('st-out');show('st-proc');hide('right-actions');hide('tgt-strip');hide('mode-strip');hide('mode-desc-bar');hide('right-foot');
+  const steps=['Reading conversation…','Extracting decisions…','Analysing failures…','Building digest…','Generating handoff…'];
+  let si=0;const lbl=document.getElementById('proc-lbl');
+  const iv=setInterval(()=>{lbl.textContent=steps[si%steps.length];si++},500);
+  await new Promise(r=>setTimeout(r,120));
+  try{
+    const{cleaned,injectionCount,flagged}=sanitizeRaw(raw);
+    if(injectionCount>0){
+      console.warn('Injection patterns neutralised:',flagged);
+      toast(`⚠ ${injectionCount} injection pattern${injectionCount>1?'s':''} detected & sanitised`);
+    }
+    const turns=parseConversation(cleaned);
+    parsedData=extract(turns,cleaned);
+    clearInterval(iv);renderAll(parsedData);saveToStorage();
+    const _tok=Math.round(handoffText.length/4);
+    const _key=getProjectKey(parsedData);
+    const _sessions=saveToHistory(_key,handoffText,parsedData.project||'',_tok);
+    if(_sessions>=2){
+      // Re-render to show history card (non-blocking)
+      setTimeout(()=>renderAll(parsedData),50);
+    }
+  }catch(e){clearInterval(iv);hide('st-proc');show('st-empty');toast('Parse error');console.error(e)}
+}
+
+function doCopyAll(){
+  if(!handoffText){toast('Nothing to copy yet');return}
+  navigator.clipboard.writeText(handoffText).then(()=>{
+    toast('Copied! Paste into any AI →');saveToStorage();
+    const b1=document.getElementById('hdr-copy'),b2=document.getElementById('hb-copy');
+    if(b1){b1.textContent='✓ Copied';setTimeout(()=>b1.textContent='Copy all',2000)}
+    if(b2){b2.classList.add('ok');b2.textContent='✓ Copied';setTimeout(()=>{b2.classList.remove('ok');b2.textContent='Copy prompt'},2000)}
+  }).catch(()=>{const ta=document.createElement('textarea');ta.value=handoffText;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Copied!')});
+}
+
+function onMetaChange(){if(parsedData)rebuild()}
+
+// ── LOCAL STORAGE ──
+const LS_KEY='contextbridge_v3';
+const LS_HISTORY_KEY='contextbridge_history_v1';
+const MAX_HISTORY=10;  // keep last 10 sessions per project
+
+// ── SESSION HISTORY ──
+function saveToHistory(projectKey, handoff, project, tokenCount){
+  try{
+    const raw=localStorage.getItem(LS_HISTORY_KEY);
+    const history=raw?JSON.parse(raw):{};
+    if(!history[projectKey]) history[projectKey]=[];
+    history[projectKey].unshift({
+      handoff, project, tokenCount,
+      savedAt:Date.now(),
+      branch:document.getElementById('meta-branch')?.value||'main',
+    });
+    // Cap per project
+    if(history[projectKey].length>MAX_HISTORY) history[projectKey]=history[projectKey].slice(0,MAX_HISTORY);
+    localStorage.setItem(LS_HISTORY_KEY,JSON.stringify(history));
+    return history[projectKey].length;
+  }catch(e){console.warn('History save failed',e);return 0;}
+}
+
+function getProjectHistory(projectKey){
+  try{
+    const raw=localStorage.getItem(LS_HISTORY_KEY);
+    if(!raw)return[];
+    return (JSON.parse(raw)[projectKey])||[];
+  }catch(e){return[];}
+}
+
+function getProjectKey(s){
+  // Stable key from project description (first 40 chars, slugified)
+  const base=(s.project||'default').slice(0,40).toLowerCase().replace(/[^a-z0-9]+/g,'-');
+  return base||'default';
+}
+
+function getHistoryAge(ts){
+  const m=Math.round((Date.now()-ts)/60000);
+  if(m<1)return'just now';
+  if(m<60)return m+'m ago';
+  const h=Math.round(m/60);
+  if(h<24)return h+'h ago';
+  return Math.round(h/24)+'d ago';
+}
+
+function renderHistoryCard(s){
+  const key=getProjectKey(s);
+  const hist=getProjectHistory(key);
+  if(hist.length<2)return''; // only show when there IS history
+  const rows=hist.slice(0,5).map((entry,i)=>{
+    const age=getHistoryAge(entry.savedAt);
+    const tokStr=entry.tokenCount?'~'+entry.tokenCount.toLocaleString()+' tk':'—';
+    const branchStr=entry.branch?` · ${entry.branch}`:'';
+    const isLatest=i===0;
+    return`<div class="list-item" style="${isLatest?'color:var(--teal)':''}">
+      <span style="font-size:11px;font-family:var(--mono);flex:1">${age}${branchStr}</span>
+      <span style="font-size:11px;color:var(--ink4)">${tokStr}</span>
+      ${isLatest?'<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:var(--teal-l);color:var(--teal);margin-left:4px">latest</span>':''}
+    </div>`;
+  }).join('');
+  const bloatWarning=hist.length>=5
+    ?`<div style="margin-top:6px;font-size:11px;color:var(--amber);padding:5px 8px;background:var(--amber-l);border-radius:5px">⚠ ${hist.length} sessions recorded. Consider summarising your project description to reduce handoff bloat.</div>`
+    :'';
+  return card('🕓','Session history','#2d7a6b',
+    `<div style="font-size:11px;color:var(--ink4);margin-bottom:6px">${hist.length} session${hist.length!==1?'s':''} for this project</div>`+rows+bloatWarning,
+    hist.slice(0,3).map((e,i)=>`Session ${i+1} (${getHistoryAge(e.savedAt)}): ${(e.project||'').slice(0,100)}`).join('\n'));
+}
+
+function saveToStorage(){
+  try{
+    const payload={
+      rawInput,
+      handoffText,
+      parsedData:parsedData?JSON.parse(JSON.stringify(parsedData,(_,v)=>typeof v==='undefined'?null:v)):null,
+      srcAI,tgtAI,handoffMode,
+      metaUrl:document.getElementById('meta-url')?.value||'',
+      metaBranch:document.getElementById('meta-branch')?.value||'',
+      savedAt:Date.now(),
+    };
+    localStorage.setItem(LS_KEY,JSON.stringify(payload));
+  }catch(e){console.warn('Storage save failed',e)}
+}
+
+function loadFromStorage(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return false;
+    const p=JSON.parse(raw);
+    if(!p||!p.handoffText)return false;
+    // Restore inputs
+    if(p.rawInput){document.getElementById('raw-input').value=p.rawInput;rawInput=p.rawInput;onInput();}
+    if(p.metaUrl){document.getElementById('meta-url').value=p.metaUrl;}
+    if(p.metaBranch){document.getElementById('meta-branch').value=p.metaBranch;}
+    // Restore AI pickers
+    if(p.srcAI){srcAI=p.srcAI;document.querySelectorAll('#src-strip .chip').forEach(c=>{c.classList.toggle('on',c.dataset.ai===p.srcAI)});}
+    if(p.tgtAI){tgtAI=p.tgtAI;document.querySelectorAll('#tgt-strip .chip').forEach(c=>{c.classList.toggle('on',c.dataset.ai===p.tgtAI)});}
+    if(p.handoffMode){handoffMode=p.handoffMode;document.querySelectorAll('#mode-strip .mode-chip').forEach(c=>{c.classList.toggle('on',c.dataset.mode===p.handoffMode)});const mdb=document.getElementById('mode-desc-bar');if(mdb){const descs={resume:'⇢ <strong>Resume</strong> — continue the work exactly where it stopped. No preamble, no reintroductions.',ceo:'✦ <strong>CEO Review</strong> — rethink the problem. Find the 10-star product hiding inside the request.',eng:'⚙ <strong>Eng Review</strong> — lock in architecture, data flow, edge cases, failure modes and diagrams before coding.',review:'🔎 <strong>Code Review</strong> — paranoid staff engineer mode: find the bugs that pass CI but blow up in production.',debug:'⚡ <strong>Debug</strong> — reproduce the failure, identify root cause, propose minimal fix.'};mdb.innerHTML=descs[p.handoffMode]||descs.resume;}}
+    // Restore output
+    parsedData=p.parsedData;
+    handoffText=p.handoffText;
+    if(parsedData&&handoffText){renderAll(parsedData);}
+    const age=Math.round((Date.now()-p.savedAt)/60000);
+    const ageStr=age<1?'just now':age<60?age+'m ago':Math.round(age/60)+'h ago';
+    showRestoreBanner(ageStr);
+    return true;
+  }catch(e){console.warn('Storage load failed',e);return false;}
+}
+
+function clearStorage(){
+  localStorage.removeItem(LS_KEY);
+  toast('Saved session cleared');
+  const banner=document.getElementById('restore-banner');
+  if(banner)banner.remove();
+}
+
+function showRestoreBanner(ageStr){
+  const existing=document.getElementById('restore-banner');
+  if(existing)return;
+  const banner=document.createElement('div');
+  banner.id='restore-banner';
+  banner.style.cssText='position:fixed;top:52px;left:0;right:0;background:#2d7a6b;color:#d4ede8;font-size:12px;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;z-index:40;font-family:var(--sans)';
+  banner.innerHTML=`<span>&#x21BA; Session restored from ${ageStr}</span><div style="display:flex;gap:8px"><button onclick="clearStorage()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:inherit;padding:3px 10px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--sans)">Clear saved</button><button onclick="document.getElementById('restore-banner').remove()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:inherit;padding:3px 10px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--sans)">Dismiss</button></div>`;
+  document.body.appendChild(banner);
+}
+
+function show(id){document.getElementById(id).style.display=''}
+function hide(id){document.getElementById(id).style.display='none'}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')doProcess()});
+document.addEventListener('DOMContentLoaded',()=>{loadFromStorage();});
+</script>
 </body>
 </html>
